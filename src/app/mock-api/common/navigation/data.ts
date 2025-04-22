@@ -47,6 +47,20 @@ export const defaultNavigation: FuseNavigationItem[] = [
         icon    : 'heroicons_outline:home',
         children: [
             {
+                id      : 'apps.ecommerce',
+                title   : 'ECommerce',
+                type    : 'collapsable',
+                icon    : 'heroicons_outline:shopping-cart',
+                children: [
+                    {
+                        id   : 'apps.ecommerce.inventory',
+                        title: 'Inventory',
+                        type : 'basic',
+                        link : '/apps/ecommerce/inventory',
+                    },
+                ],
+            },
+            /*{
                 id   : 'apps.academy',
                 title: 'Academy',
                 type : 'basic',
@@ -67,20 +81,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon : 'heroicons_outline:user-group',
                 link : '/apps/contacts',
             },
-            {
-                id      : 'apps.ecommerce',
-                title   : 'ECommerce',
-                type    : 'collapsable',
-                icon    : 'heroicons_outline:shopping-cart',
-                children: [
-                    {
-                        id   : 'apps.ecommerce.inventory',
-                        title: 'Inventory',
-                        type : 'basic',
-                        link : '/apps/ecommerce/inventory',
-                    },
-                ],
-            },
+           
             {
                 id   : 'apps.file-manager',
                 title: 'File Manager',
@@ -154,6 +155,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon : 'heroicons_outline:check-circle',
                 link : '/apps/tasks',
             },
+            */
         ],
     },
     {
