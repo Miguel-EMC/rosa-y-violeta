@@ -2,7 +2,8 @@
 import { FuseNavigationItem } from '@fuse/components/navigation';
 
 export const defaultNavigation: FuseNavigationItem[] = [
-    {
+    //!DashBoard
+    /*{
         id      : 'dashboards',
         title   : 'Dashboards',
         subtitle: 'Unique dashboard designs',
@@ -39,6 +40,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
         ],
     },
+    */
     {
         id      : 'apps',
         title   : 'Applications',
@@ -158,7 +160,8 @@ export const defaultNavigation: FuseNavigationItem[] = [
             */
         ],
     },
-    {
+    //!Pages
+    /*{
         id      : 'pages',
         title   : 'Pages',
         subtitle: 'Custom made page designs',
@@ -682,7 +685,9 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
         ],
     },
-    {
+    */
+   //!UI
+    /*{
         id      : 'user-interface',
         title   : 'User Interface',
         subtitle: 'Building blocks of the UI & UX',
@@ -957,11 +962,12 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
         ],
     },
-    {
-        id  : 'divider-1',
-        type: 'divider',
-    },
-    {
+    */
+    // {
+    //     id  : 'divider-1',
+    //     type: 'divider',
+    // },
+    /*{
         id      : 'documentation',
         title   : 'Documentation',
         subtitle: 'Everything you need to know about Fuse',
@@ -1009,7 +1015,9 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
         ],
     },
-    {
+    */
+   //!NAVIGATION
+    /*{
         id  : 'divider-2',
         type: 'divider',
     },
@@ -1166,6 +1174,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
         ],
     },
+    */
 ];
 export const compactNavigation: FuseNavigationItem[] = [
     {
