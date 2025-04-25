@@ -12,12 +12,7 @@ import { CenteredLayoutComponent } from './layouts/horizontal/centered/centered.
 import { EnterpriseLayoutComponent } from './layouts/horizontal/enterprise/enterprise.component';
 import { MaterialLayoutComponent } from './layouts/horizontal/material/material.component';
 import { ModernLayoutComponent } from './layouts/horizontal/modern/modern.component';
-import { ClassicLayoutComponent } from './layouts/vertical/classic/classic.component';
 import { ClassyLayoutComponent } from './layouts/vertical/classy/classy.component';
-import { CompactLayoutComponent } from './layouts/vertical/compact/compact.component';
-import { DenseLayoutComponent } from './layouts/vertical/dense/dense.component';
-import { FuturisticLayoutComponent } from './layouts/vertical/futuristic/futuristic.component';
-import { ThinLayoutComponent } from './layouts/vertical/thin/thin.component';
 
 @Component({
     selector     : 'layout',
@@ -25,7 +20,7 @@ import { ThinLayoutComponent } from './layouts/vertical/thin/thin.component';
     styleUrls    : ['./layout.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone   : true,
-    imports      : [NgIf, EmptyLayoutComponent, CenteredLayoutComponent, EnterpriseLayoutComponent, MaterialLayoutComponent, ModernLayoutComponent, ClassicLayoutComponent, ClassyLayoutComponent, CompactLayoutComponent, DenseLayoutComponent, FuturisticLayoutComponent, ThinLayoutComponent, SettingsComponent],
+    imports      : [NgIf, EmptyLayoutComponent, CenteredLayoutComponent, EnterpriseLayoutComponent, MaterialLayoutComponent, ModernLayoutComponent, ClassyLayoutComponent, SettingsComponent],
 })
 export class LayoutComponent implements OnInit, OnDestroy
 {
