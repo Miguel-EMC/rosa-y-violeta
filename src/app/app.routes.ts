@@ -103,9 +103,6 @@ export const appRoutes: Route[] = [
                 // Activities
                 {path: 'activities', loadChildren: () => import('app/modules/admin/pages/activities/activities.routes')},
 
-                // Authentication
-                {path: 'authentication', loadChildren: () => import('app/modules/admin/pages/authentication/authentication.routes')},
-
                 // Coming Soon
                 {path: 'coming-soon', loadChildren: () => import('app/modules/admin/pages/coming-soon/coming-soon.routes')},
 

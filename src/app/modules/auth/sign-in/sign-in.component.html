@@ -46,13 +46,13 @@
                 <mat-form-field class="w-full">
                     <mat-label>Email address</mat-label>
                     <input
-                        id="email"
+                        id="username"
                         matInput
-                        [formControlName]="'email'">
-                    <mat-error *ngIf="signInForm.get('email').hasError('required')">
+                        [formControlName]="'username'">
+                    <mat-error *ngIf="signInForm.get('username').hasError('required')">
                         Email address is required
                     </mat-error>
-                    <mat-error *ngIf="signInForm.get('email').hasError('email')">
+                    <mat-error *ngIf="signInForm.get('username').hasError('email')">
                         Please enter a valid email address
                     </mat-error>
                 </mat-form-field>
@@ -86,18 +86,18 @@
                 </mat-form-field>
 
                 <!-- Actions -->
-                <div class="inline-flex items-center justify-between w-full mt-1.5">
-                    <mat-checkbox
-                        class="-ml-2"
-                        [color]="'primary'"
-                        [formControlName]="'rememberMe'">
-                        Remember me
-                    </mat-checkbox>
-                    <a
-                        class="text-md font-medium text-primary-500 hover:underline"
-                        [routerLink]="['/forgot-password']">Forgot password?
-                    </a>
-                </div>
+<!--                <div class="inline-flex items-center justify-between w-full mt-1.5">-->
+<!--                    <mat-checkbox-->
+<!--                        class="-ml-2"-->
+<!--                        [color]="'primary'"-->
+<!--                        [formControlName]="'rememberMe'">-->
+<!--                        Remember me-->
+<!--                    </mat-checkbox>-->
+<!--                    <a-->
+<!--                        class="text-md font-medium text-primary-500 hover:underline"-->
+<!--                        [routerLink]="['/forgot-password']">Forgot password?-->
+<!--                    </a>-->
+<!--                </div>-->
 
                 <!-- Submit button -->
                 <button
