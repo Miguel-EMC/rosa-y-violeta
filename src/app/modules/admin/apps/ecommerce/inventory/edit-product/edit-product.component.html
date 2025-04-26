@@ -1,22 +1,106 @@
-<div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" *ngIf="isVisible">
-    <div class="fixed inset-0 flex items-center justify-center">
-        <div class="modal bg-transparent p-0 rounded-lg shadow-lg flex flex-col"
-             style="width: 90%; max-width: 1600px; height: 800px; max-height: 90%; overflow: hidden; margin-left: -20px;">
-            <div class="flex-grow overflow-auto">
-                <p>{{ productId }}</p>
+<!-- Backdrop -->
+<div 
+  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center overflow-y-auto" 
+  *ngIf="isVisible"
+>
+  <!-- Modal content -->
+  <div class="bg-white rounded-2xl shadow-xl w-[90%] max-w-3xl p-6 m-4">
+    <!-- Close button -->
+    <div class="flex justify-end">
+      <button mat-icon-button (click)="closeModal()">
+        <mat-icon [svgIcon]="'heroicons_outline:x-mark'" class="text-gray-600"></mat-icon>
+      </button>
+    </div>
 
-                <form action="">
-                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight leading-tight">Name</h1>
-                    <input type="text" placeholder="Enter your name" class="border border-gray-300 rounded-md p-2 mb-4 w-full">
-                        
-                </form>
-            </div>
-            <div class="p-4 bg-white flex justify-end items-center rounded-b-lg">
-                <button mat-flat-button
-                        color="primary"
-                        class="mr-4"
-                        (click)="closeModal()">Cerrar</button>
-            </div>
+    <!-- Modal Header / Título -->
+    <div class="text-center mb-6">
+      <p class="text-lg font-semibold">Editar Producto: {{ productId }}</p>
+    </div>
+
+    <!-- Buscador con lupa -->
+    <div class="flex items-center mb-6 space-x-2">
+      <div class="relative flex-1">
+        <input
+          type="text"
+          placeholder="Buscar..."
+          class="w-full border border-gray-300 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <mat-icon [svgIcon]="'heroicons_solid:magnifying-glass'" class="text-gray-400"></mat-icon>
+        </div>
+      </div>
+        <!-- <button
+            mat-flat-button
+            color="primary"
+            class="h-10 px-4 rounded-lg shadow-sm bg-blue-600 hover:bg-blue-700 transition-colors"
+            >
+            <mat-icon [svgIcon]="'heroicons_solid:magnifying-glass'" class="text-white"></mat-icon>
+        </button> -->
+        <button
+            mat-flat-button
+            color="primary"
+            class="h-10 px-4 rounded-lg shadow-sm bg-blue-600 hover:bg-blue-700 transition-colors"
+            >
+            <mat-icon [svgIcon]="'heroicons_outline:plus'" class="text-white"></mat-icon>
+        </button>
+    </div>
+
+    <div class="mb-2">
+        <h3 class="text-lg font-medium">Seleccion cantidad</h3>
+    </div>
+
+    <!-- Control de cantidad -->
+    <div class="flex items-center justify-left mb-6 space-x-4">
+      <button
+        mat-icon-button
+        color="primary"
+        (click)="decreaseQuantity()"
+        class="bg-gray-100 rounded-full hover:bg-gray-200"
+      >
+        <mat-icon [svgIcon]="'heroicons_outline:minus'"></mat-icon>
+      </button>
+      <input
+        type="number"
+        [(ngModel)]="quantity"
+        min="1"
+        class="w-16 text-center border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        mat-icon-button
+        color="primary"
+        (click)="increaseQuantity()"
+        class="bg-gray-100 rounded-full hover:bg-gray-200"
+      >
+        <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+      </button>
+    </div>
+
+    <!-- Placeholder para lista -->
+    <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm mb-4">
+        <div class="p-4 max-h-40 overflow-y-auto">
+        <ul class="space-y-2">
+            <li class="py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded-md">Elemento 1</li>
+            <li class="py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded-md">Elemento 2</li>
+            <li class="py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded-md">Elemento 3</li>
+        </ul>
         </div>
     </div>
+  
+
+
+        <!-- Actions -->
+    <div class="mt-6 flex justify-center space-x-2">
+        <!-- Botón Añadir -->
+        <button
+        mat-flat-button
+        color="primary"
+        class="px-6 h-10 rounded-lg shadow-sm bg-blue-600 hover:bg-blue-700 transition-colors"
+        (click)="onAdd()"
+        >
+        Añadir
+        </button>
+    
+    </div>
+  
+  </div>
 </div>
