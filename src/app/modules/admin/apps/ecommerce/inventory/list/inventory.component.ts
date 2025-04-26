@@ -18,6 +18,9 @@ import { InventoryService } from 'app/modules/admin/apps/ecommerce/inventory/inv
 import { InventoryBrand, InventoryCategory, InventoryPagination, InventoryProduct, InventoryTag, InventoryVendor } from 'app/modules/admin/apps/ecommerce/inventory/inventory.types';
 import { debounceTime, map, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 import { ProductsService, Product } from 'app/services/products.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ToastrService, ToastNoAnimation } from 'ngx-toastr';
+import { EditProductComponent } from '../edit-product/edit-product.component';
 
 @Component({
     selector       : 'inventory-list',
@@ -46,7 +49,7 @@ import { ProductsService, Product } from 'app/services/products.service';
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations     : fuseAnimations,
     standalone     : true,
-    imports        : [NgIf, MatProgressBarModule, MatFormFieldModule, MatIconModule, MatInputModule, FormsModule, ReactiveFormsModule, MatButtonModule, MatSortModule, NgFor, NgTemplateOutlet, MatPaginatorModule, NgClass, MatSlideToggleModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatRippleModule, AsyncPipe, CurrencyPipe],
+    imports        : [NgIf, MatProgressBarModule, MatFormFieldModule, MatIconModule, MatInputModule, FormsModule, ReactiveFormsModule, MatButtonModule, MatSortModule, NgFor, NgTemplateOutlet, MatPaginatorModule, NgClass, MatSlideToggleModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatRippleModule, AsyncPipe, CurrencyPipe, ToastNoAnimation, EditProductComponent],
 })
 export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
 {
@@ -71,6 +74,8 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
     tags: InventoryTag[];
     tagsEditMode: boolean = false;
     vendors: InventoryVendor[];
+    isModalVisible: boolean = false;
+    productId: number = 0;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -81,7 +86,9 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
         private _fuseConfirmationService: FuseConfirmationService,
         private _formBuilder: UntypedFormBuilder,
         private _inventoryService: InventoryService,
-        private _productsService: ProductsService
+        private _productsService: ProductsService,
+        private dialog: MatDialog,
+        private toastr: ToastrService,
 
     )
     {
@@ -120,99 +127,83 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
             active           : [false],
         });
 
-        // Get the brands
-        this._inventoryService.brands$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((brands: InventoryBrand[]) =>
-            {
-                // Update the brands
-                this.brands = brands;
+       
+        this.getProducts();
+      
+        
+    }
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+    openModal(id: number) : void {
+        this.productId = id;
+       
+        this.isModalVisible = true;
+        this._changeDetectorRef.markForCheck();
+    }
 
-        // Get the categories
-        this._inventoryService.categories$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((categories: InventoryCategory[]) =>
-            {
-                // Update the categories
-                this.categories = categories;
+    closeModal() : void{
+        if (this.isModalVisible) {
+            this.isModalVisible = false;
+            this._changeDetectorRef.markForCheck();
+        }
+    }
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
+    /**
+     * Delete the selected product using the form data
+     */
+    deleteSelectedProduct(id: number): void {
+        console.log(id);
+        const token = localStorage.getItem('accessToken');
+        // Abrir el diálogo de confirmación
+        const confirmation = this._fuseConfirmationService.open({
+            title  : 'Vas a eliminar un producto',
+            message: '¿Estás seguro de querer eliminar el producto?',
+            actions: {
+                confirm: {
+                    label: 'Eliminar',
+                },
+            },
+        });
+    
+        // Al cerrar el diálogo...
+        confirmation.afterClosed().subscribe(result => {
+            if ( result === 'confirmed' ) {
+                // Llamada al servicio con el id recibido
+                this._productsService.deleteProductById(token, id)
+                    .subscribe({
+                        next: (response) => {
+                            this.toastr.success('Producto eliminado', 'Alerta');
+                            // Aquí imprimes el response
+                            console.log('Delete response:', response);
+                            this.getProducts();
+                            
+                            this.closeDetails();
+                        },
+                        error: (err) => {
+                            console.error('Error deleting product:', err);
+                            // Opcional: muestra un mensaje de error al usuario
+                        }
+                    });
+            }
+        });
+    }
 
-        // Get the pagination
-        this._inventoryService.pagination$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((pagination: InventoryPagination) =>
-            {
-                // Update the pagination
-                this.pagination = pagination;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get the tags
-        this._inventoryService.tags$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((tags: InventoryTag[]) =>
-            {
-                // Update the tags
-                this.tags = tags;
-                this.filteredTags = tags;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get the vendors
-        this._inventoryService.vendors$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((vendors: InventoryVendor[]) =>
-            {
-                // Update the vendors
-                this.vendors = vendors;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Subscribe to search input field value changes
-        this.searchInputControl.valueChanges
-            .pipe(
-                takeUntil(this._unsubscribeAll),
-                debounceTime(300),
-                switchMap((query) =>
-                {
-                    this.closeDetails();
-                    this.isLoading = true;
-                    return this._inventoryService.getProducts(0, 10, 'name', 'asc', query);
-                }),
-                map(() =>
-                {
-                    this.isLoading = false;
-                }),
-            )
-            .subscribe();
-
+    getProducts(): void {
         const token = localStorage.getItem('accessToken');
         if (token) {
             this._productsService.getProducts(token).subscribe({
                 next: (products) => {
                     this.externalProducts = products;
-                    console.log('External products:', this.externalProducts);
+                    console.log('Productos actualizados:', this.externalProducts);
                     this._changeDetectorRef.markForCheck();
                 },
                 error: (err) => {
-                    console.error('Error fetching products:', err);
+                    console.error('Error al obtener productos:', err);
                 }
             });
         }
     }
+    
+    
 
     /**
      * After view init
@@ -555,40 +546,7 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
         });
     }
 
-    /**
-     * Delete the selected product using the form data
-     */
-    deleteSelectedProduct(): void
-    {
-        // Open the confirmation dialog
-        const confirmation = this._fuseConfirmationService.open({
-            title  : 'Delete product',
-            message: 'Are you sure you want to remove this product? This action cannot be undone!',
-            actions: {
-                confirm: {
-                    label: 'Delete',
-                },
-            },
-        });
-
-        // Subscribe to the confirmation dialog closed action
-        confirmation.afterClosed().subscribe((result) =>
-        {
-            // If the confirm button pressed...
-            if ( result === 'confirmed' )
-            {
-                // Get the product object
-                const product = this.selectedProductForm.getRawValue();
-
-                // Delete the product on the server
-                this._inventoryService.deleteProduct(product.id).subscribe(() =>
-                {
-                    // Close the details
-                    this.closeDetails();
-                });
-            }
-        });
-    }
+    
 
     /**
      * Show flash message

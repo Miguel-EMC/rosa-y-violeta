@@ -30,6 +30,14 @@ export class ProductsService {
         return this.http.get<Product[]>(`${this.baseUrl}products/`, { headers });
     }
 
+    deleteProductById(token: string, productId: number): Observable<any> {
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`,
+            'accept': 'application/json'
+        });
+        return this.http.delete(`${this.baseUrl}products/${productId}/`, { headers });
+    }
+
     createProduct(token: string, product: Omit<Product, 'id'>): Observable<Product> {
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${token}`,

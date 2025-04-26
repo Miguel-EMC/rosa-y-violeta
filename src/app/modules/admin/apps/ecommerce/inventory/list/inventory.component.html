@@ -72,12 +72,12 @@
                                     </ng-template>
                                 </td>
                                 <td class="px-4 py-3 text-center flex gap-2 justify-center">
-                                    <button mat-icon-button color="primary" (click)="editProduct(product)" class="hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full">
+                                    <button mat-icon-button color="primary" (click)="openModal(product.id)" class="hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full">
                                         <mat-icon [svgIcon]="'heroicons_outline:pencil-square'"></mat-icon>
                                     </button>
-                                    <button mat-icon-button color="warn" (click)="deleteProduct(product)" class="hover:bg-red-100 dark:hover:bg-red-900 rounded-full">
+                                    <button mat-icon-button color="warn" (click)="deleteSelectedProduct(product.id)" class="hover:bg-red-100 dark:hover:bg-red-900 rounded-full">
                                         <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                                    </button>
+                                    </button>                                    
                                 </td>
                             </tr>
                             </tbody>
@@ -90,4 +90,13 @@
             </ng-template>
         </div>
     </div>
+</div>
+
+
+<div class="p-6 z-100"> 
+    <app-edit-product
+    [isVisible] = "isModalVisible"
+    (close) = closeModal()
+    [productId] = "productId"
+    ></app-edit-product>
 </div>

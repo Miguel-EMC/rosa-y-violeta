@@ -1,0 +1,22 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" *ngIf="isVisible">
+    <div class="fixed inset-0 flex items-center justify-center">
+        <div class="modal bg-transparent p-0 rounded-lg shadow-lg flex flex-col"
+             style="width: 90%; max-width: 1600px; height: 800px; max-height: 90%; overflow: hidden; margin-left: -20px;">
+            <div class="flex-grow overflow-auto">
+                <p>{{ productId }}</p>
+
+                <form action="">
+                    <h1 class="text-3xl md:text-4xl font-bold tracking-tight leading-tight">Name</h1>
+                    <input type="text" placeholder="Enter your name" class="border border-gray-300 rounded-md p-2 mb-4 w-full">
+                        
+                </form>
+            </div>
+            <div class="p-4 bg-white flex justify-end items-center rounded-b-lg">
+                <button mat-flat-button
+                        color="primary"
+                        class="mr-4"
+                        (click)="closeModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
