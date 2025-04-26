@@ -17,6 +17,7 @@ import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { InventoryService } from 'app/modules/admin/apps/ecommerce/inventory/inventory.service';
 import { InventoryBrand, InventoryCategory, InventoryPagination, InventoryProduct, InventoryTag, InventoryVendor } from 'app/modules/admin/apps/ecommerce/inventory/inventory.types';
 import { debounceTime, map, merge, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { ProductsService, Product } from 'app/services/products.service';
 
 @Component({
     selector       : 'inventory-list',
@@ -49,10 +50,14 @@ import { debounceTime, map, merge, Observable, Subject, switchMap, takeUntil } f
 })
 export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
 {
+
+
     @ViewChild(MatPaginator) private _paginator: MatPaginator;
     @ViewChild(MatSort) private _sort: MatSort;
 
     products$: Observable<InventoryProduct[]>;
+    externalProducts: Product[] = [];
+
 
     brands: InventoryBrand[];
     categories: InventoryCategory[];
@@ -76,6 +81,8 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
         private _fuseConfirmationService: FuseConfirmationService,
         private _formBuilder: UntypedFormBuilder,
         private _inventoryService: InventoryService,
+        private _productsService: ProductsService
+
     )
     {
     }
@@ -149,9 +156,6 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Get the products
-        this.products$ = this._inventoryService.products$;
-
         // Get the tags
         this._inventoryService.tags$
             .pipe(takeUntil(this._unsubscribeAll))
@@ -194,6 +198,20 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
                 }),
             )
             .subscribe();
+
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            this._productsService.getProducts(token).subscribe({
+                next: (products) => {
+                    this.externalProducts = products;
+                    console.log('External products:', this.externalProducts);
+                    this._changeDetectorRef.markForCheck();
+                },
+                error: (err) => {
+                    console.error('Error fetching products:', err);
+                }
+            });
+        }
     }
 
     /**
