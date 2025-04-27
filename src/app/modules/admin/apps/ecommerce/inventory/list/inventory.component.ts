@@ -76,6 +76,7 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
     vendors: InventoryVendor[];
     isModalVisible: boolean = false;
     productId: number = 0;
+    nameProduct: string = '';
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     /**
@@ -133,9 +134,9 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
         
     }
 
-    openModal(id: number) : void {
+    openModal(id: number, nameProduct: string) : void {
         this.productId = id;
-       
+        this.nameProduct = nameProduct;
         this.isModalVisible = true;
         this._changeDetectorRef.markForCheck();
     }
