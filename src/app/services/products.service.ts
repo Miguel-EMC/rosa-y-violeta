@@ -60,7 +60,7 @@ export class ProductsService {
             'Authorization': `Bearer ${token}`,
             'accept': 'application/json'
         });
-        return this.http.put(`${this.baseUrl}products/assign_product/by_product/${productId}/`, { headers });
+        return this.http.put(`${this.baseUrl}products/assign_product/by_product/${productId}/`, payload, { headers });
     }
 
     createProduct(token: string, product: Omit<Product, 'id'>): Observable<Product> {
