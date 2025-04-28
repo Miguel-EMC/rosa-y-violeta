@@ -1,52 +1,45 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, Routes } from '@angular/router';
-import { ContactsComponent } from 'app/modules/admin/apps/contacts/contacts.component';
-import { ContactsService } from 'app/modules/admin/apps/contacts/contacts.service';
-import { ContactsDetailsComponent } from 'app/modules/admin/apps/contacts/details/details.component';
-import { ContactsListComponent } from 'app/modules/admin/apps/contacts/list/list.component';
+import { ClientsComponent } from 'app/modules/admin/apps/clients/clients.component';
 import { catchError, throwError } from 'rxjs';
+import {ClientsService} from "../../../../services/clients.service";
+import {ClientsDetailsComponent} from "./details/details.component";
+import {ClientsListComponent} from "./list/list.component";
 
 /**
- * Contact resolver
+ * Client resolver
  *
  * @param route
  * @param state
  */
-const contactResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) =>
+const clientResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) =>
 {
-    const contactsService = inject(ContactsService);
+    const clientsService = inject(ClientsService);
     const router = inject(Router);
+    const userId = parseInt(localStorage.getItem('user_id') || '0', 10);
 
-    return contactsService.getContactById(route.paramMap.get('id'))
+    return clientsService.getClientById(userId)
         .pipe(
-            // Error here means the requested contact is not available
             catchError((error) =>
             {
-                // Log the error
                 console.error(error);
-
-                // Get the parent url
                 const parentUrl = state.url.split('/').slice(0, -1).join('/');
-
-                // Navigate to there
                 router.navigateByUrl(parentUrl);
-
-                // Throw an error
                 return throwError(error);
             }),
         );
 };
 
 /**
- * Can deactivate contacts details
+ * Can deactivate clients details
  *
  * @param component
  * @param currentRoute
  * @param currentState
  * @param nextState
  */
-const canDeactivateContactsDetails = (
-    component: ContactsDetailsComponent,
+const canDeactivateClientsDetails = (
+    component: ClientsDetailsComponent,
     currentRoute: ActivatedRouteSnapshot,
     currentState: RouterStateSnapshot,
     nextState: RouterStateSnapshot) =>
@@ -58,16 +51,16 @@ const canDeactivateContactsDetails = (
         nextRoute = nextRoute.firstChild;
     }
 
-    // If the next state doesn't contain '/contacts'
+    // If the next state doesn't contain '/clients'
     // it means we are navigating away from the
-    // contacts app
-    if ( !nextState.url.includes('/contacts') )
+    // clients app
+    if ( !nextState.url.includes('/clients') )
     {
         // Let it navigate
         return true;
     }
 
-    // If we are navigating to another contact...
+    // If we are navigating to another client...
     if ( nextRoute.paramMap.get('id') )
     {
         // Just navigate
@@ -81,27 +74,25 @@ const canDeactivateContactsDetails = (
 export default [
     {
         path     : '',
-        component: ContactsComponent,
+        component: ClientsComponent,
         resolve  : {
-            tags: () => inject(ContactsService).getTags(),
+            clients : () => inject(ClientsService).getClients(),
         },
         children : [
             {
                 path     : '',
-                component: ContactsListComponent,
+                component: ClientsListComponent,
                 resolve  : {
-                    contacts : () => inject(ContactsService).getContacts(),
-                    countries: () => inject(ContactsService).getCountries(),
+                    clients : () => inject(ClientsService).getClients(),
                 },
                 children : [
                     {
                         path         : ':id',
-                        component    : ContactsDetailsComponent,
+                        component    : ClientsDetailsComponent,
                         resolve      : {
-                            contact  : contactResolver,
-                            countries: () => inject(ContactsService).getCountries(),
+                            client  : clientResolver,
                         },
-                        canDeactivate: [canDeactivateContactsDetails],
+                        canDeactivate: [canDeactivateClientsDetails],
                     },
                 ],
             },

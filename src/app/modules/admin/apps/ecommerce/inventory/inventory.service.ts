@@ -360,7 +360,7 @@ export class InventoryService
                     take(1),
                     map((products) =>
                     {
-                        // Iterate through the contacts
+                        // Iterate through the clients
                         products.forEach((product) =>
                         {
                             const tagIndex = product.tags.findIndex(tag => tag === id);

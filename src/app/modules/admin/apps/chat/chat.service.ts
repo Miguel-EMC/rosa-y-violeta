@@ -48,7 +48,7 @@ export class ChatService
     }
 
     /**
-     * Getter for contacts
+     * Getter for clients
      */
     get contacts$(): Observable<Contact[]>
     {
@@ -96,7 +96,7 @@ export class ChatService
     }
 
     /**
-     * Get contacts
+     * Get clients
      */
     getContacts(): Observable<any>
     {

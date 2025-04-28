@@ -1,6 +1,5 @@
 import { AcademyMockApi } from 'app/mock-api/apps/academy/api';
 import { ChatMockApi } from 'app/mock-api/apps/chat/api';
-import { ContactsMockApi } from 'app/mock-api/apps/contacts/api';
 import { ECommerceInventoryMockApi } from 'app/mock-api/apps/ecommerce/inventory/api';
 import { FileManagerMockApi } from 'app/mock-api/apps/file-manager/api';
 import { HelpCenterMockApi } from 'app/mock-api/apps/help-center/api';
@@ -28,7 +27,6 @@ export const mockApiServices = [
     AnalyticsMockApi,
     AuthMockApi,
     ChatMockApi,
-    ContactsMockApi,
     CryptoMockApi,
     ECommerceInventoryMockApi,
     FileManagerMockApi,

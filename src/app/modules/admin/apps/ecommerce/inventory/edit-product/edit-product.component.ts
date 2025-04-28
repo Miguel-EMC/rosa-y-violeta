@@ -24,7 +24,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() isVisible: boolean = false;
   @Output() close = new EventEmitter<void>();
   @Input() productId: number;
-  @Input() nameProduct: string = '';  
+  @Input() nameProduct: string = '';
   productNum: number = 0;
   stringName: string = '';
   quantity: number = 1;
@@ -52,33 +52,31 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
       const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollBarWidth}px`;
-  
+
       // 🔥 Solo cuando el modal se abre
       if (this.productId !== undefined) {
         this.productNum = this.productId;
         this.getClients(this.productNum);
       }
-  
+
       if (this.nameProduct !== undefined) {
         this.stringName = this.nameProduct;
       }
-  
+
     } else if (changes['isVisible'] && changes['isVisible'].currentValue === false) {
       document.body.style.overflow = 'auto';
       document.body.style.paddingRight = '0px';
     }
   }
-  
+
   //Servicio: obtener clientes por producto
   getClients(id: number): void{
-    const token = localStorage.getItem('accessToken');
-    if (token) {
       this.isLoadingClients = true;
-      this._productsService.getClientsForProduct(token, id).subscribe({
+      this._productsService.getClientsForProduct(id).subscribe({
         next: (clients) => {
           this.listClients = clients.clients;
           console.log(this.listClients);
-          
+
           this.isLoadingClients = false;
           this._changeDetectorRef.detectChanges();
       },
@@ -88,20 +86,10 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         this._changeDetectorRef.detectChanges();
       }
       })
-    }
   }
 
   //Servicio: obtener clientes por producto
   sendClientsForProduct(): void {
-    const token = localStorage.getItem('accessToken');
-    
-    if (!token) {
-      console.error('No se encontró token');
-      return;
-    }
-
-    
-  
     // Construir el body
     const payload = {
       product_id: this.productNum, // tu número de producto
@@ -113,12 +101,12 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
       })),
       is_active: true
     };
-  
+
     console.log('Enviando payload:', payload);
     console.log('Se envia esta lista',this.listClients);
-  
+
     // Enviar al servicio
-    this._productsService.sendClientsForProduct(token, this.productNum, payload).subscribe({
+    this._productsService.sendClientsForProduct(this.productNum, payload).subscribe({
       next: (response) => {
         console.log('Clientes enviados exitosamente:', response);
         this._changeDetectorRef.detectChanges();
@@ -130,7 +118,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
       }
     });
   }
-  
+
 
   //Remover clientes de la lista
   removeClient(index: number): void {
@@ -164,15 +152,15 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
       c.quantity--;
     }
   }
-  
+
   increaseClientQuantity(i: number): void {
     this.listClients[i].quantity++;
   }
-  
+
   validateClientQuantity(client: Client): void {
     if (!client.quantity || client.quantity < 1) {
       client.quantity = 1;
     }
   }
-  
+
 }

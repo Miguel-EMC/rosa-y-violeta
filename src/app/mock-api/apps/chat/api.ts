@@ -115,13 +115,13 @@ export class ChatMockApi
             .onGet('api/apps/chat/contacts')
             .reply(() =>
             {
-                // Clone the contacts
+                // Clone the clients
                 let contacts = cloneDeep(this._contacts);
 
-                // Sort the contacts by the name field by default
+                // Sort the clients by the name field by default
                 contacts.sort((a, b) => a.name.localeCompare(b.name));
 
-                // Omit details and attachments from contacts
+                // Omit details and attachments from clients
                 contacts = contacts.map(contact => omit(contact, ['details', 'attachments']));
 
                 // Return the response
@@ -138,7 +138,7 @@ export class ChatMockApi
                 // Get the contact id
                 const id = request.params.get('id');
 
-                // Clone the contacts
+                // Clone the clients
                 const contacts = cloneDeep(this._contacts);
 
                 // Find the contact

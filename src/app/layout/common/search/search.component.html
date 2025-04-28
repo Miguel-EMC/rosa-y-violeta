@@ -41,7 +41,7 @@
                         [routerLink]="result.link"
                         [value]="result.value">
                         <!-- Contacts -->
-                        <ng-container *ngIf="resultSet.id === 'contacts'">
+                        <ng-container *ngIf="resultSet.id === 'clients'">
                             <ng-container *ngTemplateOutlet="contactResult; context: {$implicit: result}"></ng-container>
                         </ng-container>
                         <!-- Pages -->
@@ -101,7 +101,7 @@
                         [routerLink]="result.link"
                         [value]="result.value">
                         <!-- Contacts -->
-                        <ng-container *ngIf="resultSet.id === 'contacts'">
+                        <ng-container *ngIf="resultSet.id === 'clients'">
                             <ng-container *ngTemplateOutlet="contactResult; context: {$implicit: result}"></ng-container>
                         </ng-container>
                         <!-- Pages -->

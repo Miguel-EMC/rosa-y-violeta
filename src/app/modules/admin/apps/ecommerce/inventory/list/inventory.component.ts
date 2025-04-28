@@ -128,10 +128,10 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
             active           : [false],
         });
 
-       
+
         this.getProducts();
-      
-        
+
+
     }
 
     openModal(id: number, nameProduct: string) : void {
@@ -153,8 +153,6 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
      */
     deleteSelectedProduct(id: number): void {
         console.log(id);
-        const token = localStorage.getItem('accessToken');
-        // Abrir el diálogo de confirmación
         const confirmation = this._fuseConfirmationService.open({
             title  : 'Vas a eliminar un producto',
             message: '¿Estás seguro de querer eliminar el producto?',
@@ -164,19 +162,17 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
                 },
             },
         });
-    
-        // Al cerrar el diálogo...
+
         confirmation.afterClosed().subscribe(result => {
             if ( result === 'confirmed' ) {
-                // Llamada al servicio con el id recibido
-                this._productsService.deleteProductById(token, id)
+                this._productsService.deleteProductById(id)
                     .subscribe({
                         next: (response) => {
                             this.toastr.success('Producto eliminado', 'Alerta');
                             // Aquí imprimes el response
                             console.log('Delete response:', response);
                             this.getProducts();
-                            
+
                             this.closeDetails();
                         },
                         error: (err) => {
@@ -189,9 +185,7 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     getProducts(): void {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            this._productsService.getProducts(token).subscribe({
+            this._productsService.getProducts().subscribe({
                 next: (products) => {
                     this.externalProducts = products;
                     console.log('Productos actualizados:', this.externalProducts);
@@ -201,10 +195,9 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
                     console.error('Error al obtener productos:', err);
                 }
             });
-        }
     }
-    
-    
+
+
 
     /**
      * After view init
@@ -547,7 +540,7 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
         });
     }
 
-    
+
 
     /**
      * Show flash message

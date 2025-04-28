@@ -51,9 +51,9 @@ export const shortcuts = [
     {
         id         : 'f5daf93e-b6f3-4199-8a0c-b951e92a6cb8',
         label      : 'Contacts',
-        description: 'List all contacts',
+        description: 'List all clients',
         icon       : 'heroicons_outline:user-group',
-        link       : '/apps/contacts',
+        link       : '/apps/clients',
         useRouter  : true,
     },
     {

@@ -34,12 +34,12 @@ export class AuthService {
         return localStorage.getItem('accessToken') ?? '';
     }
 
-    set refreshToken(token: string) {
-        localStorage.setItem('refreshToken', token);
+    set refresh(token: string) {
+        localStorage.setItem('refresh', token);
     }
 
-    get refreshToken(): string {
-        return localStorage.getItem('refreshToken') ?? '';
+    get refresh(): string {
+        return localStorage.getItem('refresh') ?? '';
     }
 
     // Public methods
@@ -64,7 +64,7 @@ export class AuthService {
             switchMap((response: any) => {
                 if (response && response.access && response.refresh) {
                     this.accessToken = response.access;
-                    this.refreshToken = response.refresh;
+                    this.refresh = response.refresh;
                     this._authenticated = true;
                     this._userService.user = response.user;
                     return of(response);
@@ -115,12 +115,13 @@ export class AuthService {
 
     // New method for token refresh
     refreshAccessToken(): Observable<any> {
-        const refreshToken = this.refreshToken;
-        if (!refreshToken) {
+        const refresh = this.refresh;
+        console.log('Refreshing access token with refresh token:', refresh);
+        if (!refresh) {
             return throwError('No refresh token available');
         }
 
-        return this._httpClient.post<any>(`${this.baseUrl}token/refresh/`, { refresh: refreshToken }).pipe(
+        return this._httpClient.post<any>(`${this.baseUrl}token/refresh/`, { refresh: refresh }).pipe(
             switchMap(response => {
                 if (response && response.access) {
                     this.accessToken = response.access;
@@ -138,13 +139,13 @@ export class AuthService {
 
     // Private methods
     private checkTokenValidity(): Observable<boolean> {
-        const refreshToken = this.refreshToken;
-        if (!refreshToken) {
+        const refresh = this.refresh;
+        if (!refresh) {
             this.signOut();
             return of(false);
         }
 
-        return this._httpClient.post<any>(`${this.baseUrl}token/refresh/`, { refresh: refreshToken }).pipe(
+        return this._httpClient.post<any>(`${this.baseUrl}token/refresh/`, { refresh: refresh }).pipe(
             switchMap(response => {
                 if (response && response.access) {
                     this.accessToken = response.access;
@@ -163,9 +164,9 @@ export class AuthService {
 
     logout(): Observable<any> {
         const accessToken = this.accessToken; // Access token should be used in the Authorization header
-        const refreshToken = this.refreshToken; // Refresh token should be sent in the request body
+        const refresh = this.refresh; // Refresh token should be sent in the request body
 
-        if (!accessToken || !refreshToken) {
+        if (!accessToken || !refresh) {
             return throwError('No access or refresh token available');
         }
 
@@ -174,11 +175,11 @@ export class AuthService {
             'Authorization': `Bearer ${accessToken}` // Include access token in Authorization header
         });
 
-        return this._httpClient.post<any>(`${this.baseUrl}logout/`, { refresh: refreshToken }, { headers }).pipe(
+        return this._httpClient.post<any>(`${this.baseUrl}logout/`, { refresh: refresh }, { headers }).pipe(
             switchMap(() => {
                 // Clear the tokens from local storage
                 localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
+                localStorage.removeItem('refresh');
                 this._authenticated = false;
                 this._router.navigate(['/sign-in']); // Redirect to login page or any other appropriate page
                 return of(true);

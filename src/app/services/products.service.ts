@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -13,7 +13,6 @@ export interface Product {
     wholesale_price: string;
     unit_price: string;
 }
-
 
 export interface Client {
     client_id: number;
@@ -31,60 +30,34 @@ export class ProductsService {
 
     constructor(private http: HttpClient) {}
 
-    getProducts(token: string): Observable<Product[]> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'accept': 'application/json'
-        });
-        return this.http.get<Product[]>(`${this.baseUrl}products/`, { headers });
+    getProducts(): Observable<Product[]> {
+        return this.http.get<Product[]>(`${this.baseUrl}products/`);
     }
 
-    deleteProductById(token: string, productId: number): Observable<any> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'accept': 'application/json'
-        });
-        return this.http.delete(`${this.baseUrl}products/${productId}/`, { headers });
+    deleteProductById(productId: number): Observable<any> {
+        return this.http.delete(`${this.baseUrl}products/${productId}/`);
     }
 
-    getClientsForProduct(token: string, productId: number): Observable<any> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'accept': 'application/json'
-        });
-        return this.http.get(`${this.baseUrl}products/assign_product/by_product/${productId}/`, { headers });
+    getClientsForProduct(productId: number): Observable<any> {
+        return this.http.get(`${this.baseUrl}products/assign_product/by_product/${productId}/`);
     }
 
-    sendClientsForProduct(token: string, productId: number, payload: any): Observable<any> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'accept': 'application/json'
-        });
-        return this.http.put(`${this.baseUrl}products/assign_product/by_product/${productId}/`, { headers });
+    sendClientsForProduct(productId: number, payload: any): Observable<any> {
+        return this.http.put(
+            `${this.baseUrl}products/assign_product/by_product/${productId}/`,
+            payload
+        );
     }
 
-    createProduct(token: string, product: Omit<Product, 'id'>): Observable<Product> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'accept': 'application/json',
-            'Content-Type': 'application/json'
-        });
-        return this.http.post<Product>(`${this.baseUrl}products/`, product, { headers });
+    createProduct(product: Omit<Product, 'id'>): Observable<Product> {
+        return this.http.post<Product>(`${this.baseUrl}products/`, product);
     }
 
-    headProducts(token: string): Observable<any> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'accept': 'application/json'
-        });
-        return this.http.head(`${this.baseUrl}products/`, { headers, observe: 'response' });
+    headProducts(): Observable<any> {
+        return this.http.head(`${this.baseUrl}products/`, { observe: 'response' });
     }
 
-    optionsProducts(token: string): Observable<any> {
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'accept': 'application/json'
-        });
-        return this.http.options(`${this.baseUrl}products/`, { headers, observe: 'response' });
+    optionsProducts(): Observable<any> {
+        return this.http.options(`${this.baseUrl}products/`, { observe: 'response' });
     }
 }
