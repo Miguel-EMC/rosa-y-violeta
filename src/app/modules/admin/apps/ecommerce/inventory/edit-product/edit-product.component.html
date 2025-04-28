@@ -111,12 +111,13 @@
     <div class="mt-6 flex justify-center space-x-2">
         <!-- Botón Añadir -->
         <button
-        mat-flat-button
-        color="primary"
-        class="px-6 h-10 rounded-lg shadow-sm bg-blue-600 hover:bg-blue-700 transition-colors"
-        (click)="sendClientsForProduct()"
+          mat-flat-button
+          color="primary"
+          class="px-6 h-10 rounded-lg shadow-sm bg-blue-600 hover:bg-blue-700 transition-colors"
+          (click)="sendClientsForProduct()"
+          [disabled]="isLoading"
         >
-        Añadir
+          {{ isLoading ? 'Enviando...' : 'Añadir' }}
         </button>
     </div>
   

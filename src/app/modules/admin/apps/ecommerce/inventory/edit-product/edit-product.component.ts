@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { Client, ProductsService } from 'app/services/products.service';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-product',
@@ -30,6 +31,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
   quantity: number = 1;
   listClients: Client[] = [];
   isLoadingClients: boolean = true;
+  isLoading: boolean = false;
 
 
 
@@ -37,7 +39,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
     private _productsService: ProductsService,
     private _changeDetectorRef: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
-
+    private toastr: ToastrService,
   )
   {
   }
@@ -92,7 +94,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
   sendClientsForProduct(): void {
     // Construir el body
     const payload = {
-      product_id: this.productNum, // tu número de producto
+      product_id: this.productNum,
       clients: this.listClients.map(client => ({
         client_id: client.client_id,
         quantity: client.quantity,
@@ -105,15 +107,18 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
     console.log('Enviando payload:', payload);
     console.log('Se envia esta lista',this.listClients);
 
-    // Enviar al servicio
+    this.isLoading = true;
     this._productsService.sendClientsForProduct(this.productNum, payload).subscribe({
       next: (response) => {
-        console.log('Clientes enviados exitosamente:', response);
+        this.toastr.success('Clienes registrados al producto exitosamente', 'Aviso');
+        this.isLoading = false;
+        this.closeModal();
         this._changeDetectorRef.detectChanges();
         // Aquí podrías cerrar el modal o mostrar un mensaje de éxito
       },
       error: (err) => {
-        console.error('Error al enviar clientes:', err);
+        this.toastr.error('Hubo un error al registrar al cliente', 'Error');
+        this.isLoading = false;
         this._changeDetectorRef.detectChanges();
       }
     });
