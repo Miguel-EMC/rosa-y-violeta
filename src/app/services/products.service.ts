@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Product {
@@ -27,6 +27,8 @@ export interface Client {
 })
 export class ProductsService {
     private baseUrl = environment.apiUrl;
+    private productsUpdatedSource = new Subject<void>();
+    productsUpdated$ = this.productsUpdatedSource.asObservable();
 
     constructor(private http: HttpClient) {}
 
@@ -47,6 +49,10 @@ export class ProductsService {
             `${this.baseUrl}products/assign_product/by_product/${productId}/`,
             payload
         );
+    }
+
+    notifyProductsUpdated() {
+        this.productsUpdatedSource.next();
     }
 
     createProduct(product: Omit<Product, 'id'>): Observable<Product> {

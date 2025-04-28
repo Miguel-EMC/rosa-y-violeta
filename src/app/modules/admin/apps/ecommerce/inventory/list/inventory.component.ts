@@ -130,6 +130,10 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
 
 
         this.getProducts();
+        //Listener para cuando se agregue usuarios a productos
+        this._productsService.productsUpdated$.subscribe(() => {
+            this.getProducts();
+        });
 
 
     }

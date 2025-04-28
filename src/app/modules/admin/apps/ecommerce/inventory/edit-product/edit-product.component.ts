@@ -30,6 +30,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
   stringName: string = '';
   quantity: number = 1;
   listClients: Client[] = [];
+  copyListClients: Client[] = [];
   isLoadingClients: boolean = true;
   isLoading: boolean = false;
 
@@ -76,9 +77,8 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
       this.isLoadingClients = true;
       this._productsService.getClientsForProduct(id).subscribe({
         next: (clients) => {
-          this.listClients = clients.clients;
-          console.log(this.listClients);
-
+          this.listClients = clients.clients || [];
+          this.copyListClients = JSON.parse(JSON.stringify(this.listClients));
           this.isLoadingClients = false;
           this._changeDetectorRef.detectChanges();
       },
@@ -112,9 +112,9 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
       next: (response) => {
         this.toastr.success('Clienes registrados al producto exitosamente', 'Aviso');
         this.isLoading = false;
+        this._productsService.notifyProductsUpdated();
         this.closeModal();
         this._changeDetectorRef.detectChanges();
-        // Aquí podrías cerrar el modal o mostrar un mensaje de éxito
       },
       error: (err) => {
         this.toastr.error('Hubo un error al registrar al cliente', 'Error');
@@ -144,6 +144,11 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
       }
    });
   }
+
+  hasChanges(): boolean {
+    return JSON.stringify(this.listClients) !== JSON.stringify(this.copyListClients);
+  }
+  
 
   closeModal(): void {
     this.isVisible = false;
