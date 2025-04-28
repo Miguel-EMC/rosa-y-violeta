@@ -16,9 +16,7 @@ export class AuthService {
     private baseUrl = environment.apiUrl;
 
     constructor() {
-        interval(60000).subscribe(() => {
-            this.checkTokenValidity().subscribe();
-        });
+
     }
 
     private get _userService(): UserService {

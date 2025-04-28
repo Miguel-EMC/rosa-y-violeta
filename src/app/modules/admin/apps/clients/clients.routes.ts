@@ -16,9 +16,9 @@ const clientResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapsho
 {
     const clientsService = inject(ClientsService);
     const router = inject(Router);
-    const userId = parseInt(localStorage.getItem('user_id') || '0', 10);
+    const clientId = parseInt(route.params['id'], 10);
 
-    return clientsService.getClientById(userId)
+    return clientsService.getClientById(clientId)
         .pipe(
             catchError((error) =>
             {
