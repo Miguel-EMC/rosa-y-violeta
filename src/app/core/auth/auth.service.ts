@@ -116,7 +116,6 @@ export class AuthService {
     // New method for token refresh
     refreshAccessToken(): Observable<any> {
         const refresh = this.refresh;
-        console.log('Refreshing access token with refresh token:', refresh);
         if (!refresh) {
             return throwError('No refresh token available');
         }
@@ -125,13 +124,16 @@ export class AuthService {
             switchMap(response => {
                 if (response && response.access) {
                     this.accessToken = response.access;
+                    if (response.refresh) {
+                        this.refresh = response.refresh;
+                    }
                     return of(response);
                 } else {
                     return throwError('Failed to refresh access token');
                 }
             }),
             catchError((error) => {
-                this.signOut(); // Log out on failure
+                this.signOut();
                 return throwError(error);
             })
         );
