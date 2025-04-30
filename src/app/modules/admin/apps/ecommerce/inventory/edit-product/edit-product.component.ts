@@ -8,6 +8,14 @@ import { FormsModule } from '@angular/forms';
 import { Client, ProductsService } from 'app/services/products.service';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
 import { ToastrService } from 'ngx-toastr';
+import { FormControl } from '@angular/forms';
+import { debounceTime, switchMap } from 'rxjs/operators';
+import { ClientsService } from 'app/services/clients.service';
+import { finalize } from 'rxjs/operators';
+import { ReactiveFormsModule } from '@angular/forms';
+import {MatAutocompleteModule} from "@angular/material/autocomplete";
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-edit-product',
@@ -17,6 +25,8 @@ import { ToastrService } from 'ngx-toastr';
     MatIconModule,    // ← para <mat-icon [svgIcon]="…">
     MatButtonModule,  // ← para mat-flat-button, mat-icon-button
     FormsModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule
   ],
   templateUrl: './edit-product.component.html',
   styleUrl: './edit-product.component.scss'
@@ -26,6 +36,9 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
   @Output() close = new EventEmitter<void>();
   @Input() productId: number;
   @Input() nameProduct: string = '';
+  @ViewChild(MatAutocompleteTrigger) autocompleteTrigger: MatAutocompleteTrigger;
+  @ViewChild('searchInput') searchInput: any;
+
   productNum: number = 0;
   stringName: string = '';
   quantity: number = 1;
@@ -35,17 +48,72 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
   isLoading: boolean = false;
 
 
+  /*** Search Clients ***/
+  userResults: any[] = [];
+  userHasMore = false;
+  userLoading = false;
+  userSkip = 0;
+  userTake = 10;
+  lastSearchText = '';
+  public searchUserControl: FormControl = new FormControl('');
+
 
   constructor(
     private _productsService: ProductsService,
     private _changeDetectorRef: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
     private toastr: ToastrService,
+    private _clientsService: ClientsService
   )
   {
   }
 
-  ngOnInit(): void {}
+    ngOnInit(): void {
+        this.searchUserControl.valueChanges
+            .pipe(debounceTime(150))
+            .subscribe((text) => {
+                this.lastSearchText = text;
+                this.userSkip = 0;
+                this.userResults = [];
+                this.loadUsers(text, true);
+            });
+    }
+
+    loadUsers(text: string, reset = false) {
+        this.userLoading = true;
+        this._clientsService.searchClients({ full_name: text }, this.userTake, this.userSkip)
+            .subscribe(res => {
+                const newUsers = res.results;
+                if (reset) {
+                    this.userResults = newUsers.map(u => ({
+                        full_name: u.full_name,
+                        cedula: u.cedula
+                    }));
+                } else {
+                    this.userResults = [...this.userResults, ...newUsers];
+                }
+                this.userHasMore = (this.userResults.length < res.count);
+                this.userLoading = false;
+                setTimeout(() => {
+                    if (
+                        this.userResults.length > 0 &&
+                        this.autocompleteTrigger &&
+                        this.searchInput &&
+                        document.activeElement === this.searchInput.nativeElement
+                    ) {
+                        this.autocompleteTrigger.openPanel();
+                    }
+                });
+            });
+    }
+    displayUser(user: any): string {
+        return user && user.full_name ? user.full_name : '';
+    }
+
+    loadMoreUsers() {
+        this.userSkip += this.userTake;
+        this.loadUsers(this.lastSearchText, false);
+    }
 
   ngAfterViewInit(): void {}
 
@@ -148,7 +216,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
   hasChanges(): boolean {
     return JSON.stringify(this.listClients) !== JSON.stringify(this.copyListClients);
   }
-  
+
 
   closeModal(): void {
     this.isVisible = false;

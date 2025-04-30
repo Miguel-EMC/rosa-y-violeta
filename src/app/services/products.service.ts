@@ -22,6 +22,10 @@ export interface Client {
     unit_price: string;
 }
 
+export interface ProductsApiResponse {
+    count: number;
+    results: Product[];
+}
 @Injectable({
     providedIn: 'root'
 })
@@ -32,8 +36,8 @@ export class ProductsService {
 
     constructor(private http: HttpClient) {}
 
-    getProducts(): Observable<Product[]> {
-        return this.http.get<Product[]>(`${this.baseUrl}products/`);
+    getProducts(take = 10, skip = 0): Observable<ProductsApiResponse> {
+        return this.http.get<ProductsApiResponse>(`${this.baseUrl}products/?take=${take}&skip=${skip}`);
     }
 
     deleteProductById(productId: number): Observable<any> {
@@ -65,5 +69,11 @@ export class ProductsService {
 
     optionsProducts(): Observable<any> {
         return this.http.options(`${this.baseUrl}products/`, { observe: 'response' });
+    }
+    searchProducts(body: { sku?: string; name?: string }, take = 10, skip = 0): Observable<ProductsApiResponse> {
+        return this.http.post<ProductsApiResponse>(
+            `${this.baseUrl}products/assign_product/search_products/?take=${take}&skip=${skip}`,
+            body
+        );
     }
 }

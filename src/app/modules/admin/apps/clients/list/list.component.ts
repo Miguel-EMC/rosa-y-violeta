@@ -7,9 +7,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
-import {Observable, Subject} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {ClientsService} from "../../../../../services/clients.service";
 import { CommonModule } from '@angular/common';
+import {MatPaginatorModule} from "@angular/material/paginator";
 
 @Component({
     selector       : 'clients-list',
@@ -17,17 +18,23 @@ import { CommonModule } from '@angular/common';
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports: [CommonModule, MatSidenavModule, MatFormFieldModule, MatIconModule, MatInputModule, FormsModule, ReactiveFormsModule, MatButtonModule, RouterOutlet, NgClass, RouterLink],
+    imports: [CommonModule, MatSidenavModule, MatFormFieldModule, MatIconModule, MatInputModule, FormsModule, ReactiveFormsModule, MatButtonModule, RouterOutlet, NgClass, RouterLink, MatPaginatorModule],
 })
 export class ClientsListComponent implements OnInit, OnDestroy
 {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
     drawerMode = 'side';
-    clientsCount = 0;
     searchInputControl = new FormControl('');
-    clients$: Observable<any[]>;
     selectedClient: any = null;
+
+
+    /*** Variables of pagination ***/
+    clients$: Observable<any[]>;
+    clientsCount = 0;
+    page = 0;
+    pageSize = 10;
+
     /**
      * Constructor
      */
@@ -50,7 +57,8 @@ export class ClientsListComponent implements OnInit, OnDestroy
      */
 
     ngOnInit(): void {
-        this.clients$ = this._clientsService.getClients();
+        this.loadClients();
+
         this.clients$.subscribe(clients => {
             this.clientsCount = clients.length;
             const id = this._activatedRoute.snapshot.firstChild?.params['id'];
@@ -70,6 +78,37 @@ export class ClientsListComponent implements OnInit, OnDestroy
                 this.selectedClient = null;
             }
         });
+    }
+
+    loadClients(): void {
+        this._clientsService.getClients(this.pageSize, this.page * this.pageSize)
+            .subscribe(response => {
+                this.clientsCount = response.count;
+                this.clients$ = of(response.results);
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    get pageIndex(): number {
+        return this.page;
+    }
+
+    get totalPages(): number {
+        return Math.ceil(this.clientsCount / this.pageSize) || 1;
+    }
+
+    goToPreviousPage(): void {
+        if (this.page > 0) {
+            this.page--;
+            this.loadClients();
+        }
+    }
+
+    goToNextPage(): void {
+        if ((this.page + 1) < this.totalPages) {
+            this.page++;
+            this.loadClients();
+        }
     }
 
     /**

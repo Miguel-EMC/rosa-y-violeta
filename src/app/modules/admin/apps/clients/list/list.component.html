@@ -1,12 +1,10 @@
-<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden">
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden bg-white">
 
-    <mat-drawer-container
-        class="flex-auto h-full bg-card dark:bg-transparent"
-        (backdropClick)="onBackdropClicked()">
+    <mat-drawer-container class="flex-auto h-full bg-card dark:bg-transparent " (backdropClick)="onBackdropClicked()">
 
         <!-- Drawer -->
         <mat-drawer
-            class="w-full md:w-160 dark:bg-gray-900"
+            class="w-full md:w-160"
             [mode]="drawerMode"
             [opened]="false"
             [position]="'end'"
@@ -15,111 +13,135 @@
             <router-outlet></router-outlet>
         </mat-drawer>
 
-        <mat-drawer-content class="flex flex-col">
+        <mat-drawer-content class="flex flex-col flex-1">
 
-            <!-- Main -->
-            <div class="flex-auto">
-
-                <!-- Header -->
-                <div class="flex flex-col sm:flex-row md:flex-col flex-auto justify-between py-8 px-6 md:px-8 border-b">
-
-                    <!-- Title -->
-                    <div>
-                        <div class="text-4xl font-extrabold tracking-tight leading-none">Listado de Clientes</div>
-                        <div class="ml-0.5 font-medium text-secondary">
+            <!-- Header -->
+            <div class="flex flex-col px-8 py-6 border-b w-full">
+                <!-- Top row with title and add button -->
+                <div class="flex flex-row items-center justify-between mb-4">
+                    <!-- Title and count section -->
+                    <div class="text-left">
+                        <h1 class="text-3xl font-extrabold tracking-tight text-rose-700 dark:text-rose-100">Listado de
+                            Clientes</h1>
+                        <div class="font-medium text-rose-500 mt-1">
                             <ng-container *ngIf="clientsCount > 0">
-                                {{clientsCount}}
+                                {{ clientsCount }}
                             </ng-container>
-                            {{clientsCount | i18nPlural: {
-                            '=0'   : 'No clients',
-                            '=1'   : 'client',
-                            'other': 'clients'
-                        } }}
+                            {{
+                                clientsCount | i18nPlural: {
+                                    '=0': 'No hay Clientes',
+                                    '=1': 'Cliente',
+                                    'other': 'Clientes'
+                                }
+                            }}
                         </div>
                     </div>
 
-                    <!-- Main actions -->
-                    <div class="flex items-center mt-4 sm:mt-0 md:mt-4">
-                        <!-- Search -->
-                        <div class="flex-auto">
-                            <mat-form-field
-                                class="fuse-mat-dense fuse-mat-rounded w-full min-w-50"
-                                subscriptSizing="dynamic">
-                                <mat-icon
-                                    class="icon-size-5"
-                                    matPrefix
-                                    [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
-                                <input
-                                    matInput
-                                    [formControl]="searchInputControl"
-                                    [autocomplete]="'off'"
-                                    [placeholder]="'Search clients'">
-                            </mat-form-field>
-                        </div>
-                        <!-- Add client button -->
-                        <button
-                            class="ml-4"
-                            mat-flat-button
-                            [color]="'primary'"
-                            (click)="createClient()">
-                            <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-                            <span class="ml-2 mr-1">Add</span>
-                        </button>
-                    </div>
+                    <!-- Botón agregar -->
+                    <button
+                        mat-flat-button
+                        color="primary"
+                        (click)="createClient()"
+                        class="h-12 px-6 rounded-xl shadow bg-pink-600 hover:bg-pink-700 text-white font-semibold text-base transition-colors flex items-center gap-2">
+                        <mat-icon [svgIcon]="'heroicons_outline:plus'" class="text-white"></mat-icon>
+                        <span>Agregar nuevo Cliente</span>
+                    </button>
                 </div>
 
-                <!-- Clients list -->
-                <div class="relative">
-                    <ng-container *ngIf="clients$ | async as clients">
-                        <ng-container *ngIf="clients.length; else noClients">
-                            <ng-container *ngFor="let client of clients; let i = index; trackBy: trackByFn">
-                                <!-- Group -->
-                                <ng-container *ngIf="i === 0 || client.name.charAt(0) !== clients[i - 1].name.charAt(0)">
-                                    <div class="z-10 sticky top-0 -mt-px px-6 py-1 md:px-8 border-t border-b font-medium uppercase text-secondary bg-gray-50 dark:bg-gray-900">
-                                        {{client.name.charAt(0)}}
-                                    </div>
-                                </ng-container>
-                                <!-- Client -->
-                                <a
-                                    class="z-20 flex items-center px-6 py-4 md:px-8 cursor-pointer border-b"
-                                    [ngClass]="{
-                                        'hover:bg-gray-100 dark:hover:bg-hover': !selectedClient || selectedClient.id !== client.id,
-                                        'bg-primary-50 dark:bg-hover': selectedClient && selectedClient.id === client.id
-                                    }"
-                                    [routerLink]="['./', client.id]">
-                                    <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
-                                        <ng-container *ngIf="client.avatar">
-                                            <img
-                                                class="object-cover w-full h-full"
-                                                [src]="client.avatar"
-                                                alt="Client avatar"/>
-                                        </ng-container>
-                                        <ng-container *ngIf="!client.avatar">
-                                            <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                                                {{client.name.charAt(0)}}
-                                            </div>
-                                        </ng-container>
-                                    </div>
-                                    <div class="min-w-0 ml-4">
-                                        <div class="font-medium leading-5 truncate">{{client.name}}</div>
-                                        <div class="leading-5 truncate text-secondary">{{client.title}}</div>
-                                    </div>
-                                </a>
-                            </ng-container>
-                        </ng-container>
-                    </ng-container>
-
-                    <!-- No clients -->
-                    <ng-template #noClients>
-                        <div class="p-8 sm:p-16 border-t text-4xl font-semibold tracking-tight text-center">There are no clients!</div>
-                    </ng-template>
-
+                <!-- Centered search input -->
+                <div class="flex justify-center w-full">
+                    <div class="relative w-full max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <mat-icon [svgIcon]="'heroicons_solid:magnifying-glass'" class="text-pink-400"></mat-icon>
+                        </div>
+                        <input
+                            [formControl]="searchInputControl"
+                            class="w-full h-12 pl-10 pr-4 py-2 text-base bg-white dark:bg-gray-800 border border-pink-200 dark:border-pink-700 rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                            placeholder="Buscar clientes por nombre o cedula"
+                            autocomplete="off">
+                    </div>
                 </div>
 
             </div>
 
+            <div class="flex-1 overflow-y-auto w-full">
+                <ng-container *ngIf="clients$ | async as clients">
+                    <ng-container *ngIf="clients.length; else noClients">
+                        <ng-container *ngFor="let client of clients; let i = index; trackBy: trackByFn">
+                            <!-- Client Row -->
+                            <a
+                                class="flex items-center gap-5 px-8 py-6 border-b transition-all duration-150 w-full group cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-900/30"
+                                [ngClass]="{
+                        'bg-rose-100 dark:bg-rose-800/20': selectedClient && selectedClient.id === client.id
+                    }"
+                                [routerLink]="['./', client.id]">
+                                <div
+                                    class="flex items-center justify-center w-16 h-16 rounded-full overflow-hidden border-2 border-rose-200 bg-white">
+                                    <ng-container *ngIf="client.avatar">
+                                        <img
+                                            class="object-cover w-full h-full"
+                                            [src]="client.avatar"
+                                            alt="Client avatar"/>
+                                    </ng-container>
+                                    <ng-container *ngIf="!client.avatar">
+                                        <div
+                                            class="flex items-center justify-center w-full h-full rounded-full text-2xl font-bold uppercase text-rose-700 dark:text-rose-100">
+                                            {{ client.full_name.charAt(0) }}
+                                        </div>
+                                    </ng-container>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div
+                                        class="font-semibold text-xl truncate text-rose-900 dark:text-rose-100">{{ client.full_name }}
+                                    </div>
+                                    <div class="text-sm text-rose-500 truncate">{{ client.title }}</div>
+                                    <div class="text-base text-rose-400 truncate">{{ client.cedula }}</div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                                        <mat-icon [svgIcon]="'heroicons_outline:map-pin'"
+                                                  class="icon-size-4 mr-1"></mat-icon>
+                                        {{ client.address }}
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-end ml-2">
+                                    <div class="text-lg font-bold text-rose-700 dark:text-rose-200">
+                                        ${{ client.balance }}
+                                    </div>
+                                    <div class="text-xs text-rose-500 mt-1">Balance</div>
+                                </div>
+                            </a>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+
+                <!-- No clients -->
+                <ng-template #noClients>
+                    <div
+                        class="p-16 text-2xl font-semibold tracking-tight text-center text-rose-400 dark:text-rose-500">
+                        There are no clients!
+                    </div>
+                </ng-template>
+            </div>
+
+            <!-- Paginator -->
+            <div class="px-8 py-6 border-t w-full">
+                <div class="flex justify-end items-center gap-2 mt-4">
+                    <button
+                        class="px-4 py-2 rounded bg-pink-500 text-white font-semibold hover:bg-pink-600 transition"
+                        [disabled]="pageIndex === 0"
+                        (click)="goToPreviousPage()">
+                        Anterior
+                    </button>
+                    <span class="text-pink-700 dark:text-pink-300 font-semibold">
+                Página {{ pageIndex + 1 }} de {{ totalPages }}
+            </span>
+                    <button
+                        class="px-4 py-2 rounded bg-pink-500 text-white font-semibold hover:bg-pink-600 transition"
+                        [disabled]="(pageIndex + 1) >= totalPages"
+                        (click)="goToNextPage()">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
         </mat-drawer-content>
-
     </mat-drawer-container>
-
 </div>

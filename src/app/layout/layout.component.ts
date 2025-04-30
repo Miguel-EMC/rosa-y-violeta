@@ -13,6 +13,7 @@ import { EnterpriseLayoutComponent } from './layouts/horizontal/enterprise/enter
 import { MaterialLayoutComponent } from './layouts/horizontal/material/material.component';
 import { ModernLayoutComponent } from './layouts/horizontal/modern/modern.component';
 import { ClassyLayoutComponent } from './layouts/vertical/classy/classy.component';
+import { DenseLayoutComponent } from "./layouts/vertical/dense/dense.component";
 
 @Component({
     selector     : 'layout',
@@ -20,7 +21,7 @@ import { ClassyLayoutComponent } from './layouts/vertical/classy/classy.componen
     styleUrls    : ['./layout.component.scss'],
     encapsulation: ViewEncapsulation.None,
     standalone   : true,
-    imports      : [NgIf, EmptyLayoutComponent, CenteredLayoutComponent, EnterpriseLayoutComponent, MaterialLayoutComponent, ModernLayoutComponent, ClassyLayoutComponent, SettingsComponent],
+    imports: [NgIf, EmptyLayoutComponent, CenteredLayoutComponent, EnterpriseLayoutComponent, MaterialLayoutComponent, ModernLayoutComponent, ClassyLayoutComponent, SettingsComponent, DenseLayoutComponent],
 })
 export class LayoutComponent implements OnInit, OnDestroy
 {

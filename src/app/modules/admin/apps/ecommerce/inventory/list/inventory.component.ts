@@ -7,7 +7,7 @@ import { MatOptionModule, MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import {MatPaginator, MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -79,6 +79,16 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
     nameProduct: string = '';
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+
+    /*** Pagination ***/
+    totalProducts = 0;
+    pageSize = 10;
+    pageIndex = 0;
+
+    /*** Variables to search ***/
+    searchSku: string = '';
+    searchName: string = '';
+
     /**
      * Constructor
      */
@@ -128,6 +138,14 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
             active           : [false],
         });
 
+
+        this.searchInputControl.valueChanges
+            .pipe(debounceTime(400))
+            .subscribe((value) => {
+                this.searchName = value;
+                this.pageIndex = 0;
+                this.searchProducts();
+            });
 
         this.getProducts();
         //Listener para cuando se agregue usuarios a productos
@@ -189,19 +207,59 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     getProducts(): void {
-            this._productsService.getProducts().subscribe({
-                next: (products) => {
-                    this.externalProducts = products;
-                    console.log('Productos actualizados:', this.externalProducts);
-                    this._changeDetectorRef.markForCheck();
-                },
-                error: (err) => {
-                    console.error('Error al obtener productos:', err);
-                }
-            });
+        this._productsService.getProducts(this.pageSize, this.pageIndex * this.pageSize).subscribe({
+            next: (response) => {
+                this.externalProducts = response.results;
+                this.totalProducts = response.count;
+                this._changeDetectorRef.markForCheck();
+            },
+            error: (err) => {
+                console.error('Error al obtener productos:', err);
+            }
+        });
+    }
+
+    get totalPages(): number {
+        return Math.ceil(this.totalProducts / this.pageSize);
+    }
+
+    goToPreviousPage(): void {
+        if (this.pageIndex > 0) {
+            this.pageIndex--;
+            this.getProducts();
+        }
+    }
+
+    goToNextPage(): void {
+        if ((this.pageIndex + 1) < this.totalPages) {
+            this.pageIndex++;
+            if (this.searchName || this.searchSku) {
+                this.searchProducts();
+            } else {
+                this.getProducts();
+            }
+        } else {
+            this.toastr.info('No existen más datos', 'Información');
+        }
     }
 
 
+    searchProducts(): void {
+        const body: any = {};
+        if (this.searchSku) body.sku = this.searchSku;
+        if (this.searchName) body.name = this.searchName;
+
+        this._productsService.searchProducts(body, this.pageSize, this.pageIndex * this.pageSize).subscribe({
+            next: (response) => {
+                this.externalProducts = response.results;
+                this.totalProducts = response.count;
+                this._changeDetectorRef.markForCheck();
+            },
+            error: (err) => {
+                this.toastr.error('Error al buscar productos', 'Error');
+            }
+        });
+    }
 
     /**
      * After view init
