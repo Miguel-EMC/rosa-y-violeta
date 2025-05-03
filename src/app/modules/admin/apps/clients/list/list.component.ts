@@ -22,6 +22,7 @@ import {CommonModule} from '@angular/common';
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {AddClientModalComponent} from "../../ecommerce/inventory/add-client-modal/add-client-modal.component";
 import {ToastrService} from 'ngx-toastr';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
     selector: 'clients-list',
@@ -72,8 +73,13 @@ export class ClientsListComponent implements OnInit, OnDestroy {
      */
 
     ngOnInit(): void {
+        this.searchInputControl.valueChanges
+            .pipe(debounceTime(300), distinctUntilChanged())
+            .subscribe(value => {
+                this.page = 0;
+                this.loadClients();
+            });
         this.loadClients();
-
         this._activatedRoute.params.subscribe(params => {
             const id = params['id'];
             if (id) {
@@ -88,18 +94,23 @@ export class ClientsListComponent implements OnInit, OnDestroy {
     }
 
     loadClients(): void {
-        this._clientsService.getClients(this.pageSize, this.page * this.pageSize)
-            .subscribe(response => {
-                this.clientsCount = response.count;
-                this.clients$ = of(response.results);
-                const id = this._activatedRoute.snapshot.firstChild?.params['id'];
-                if (id) {
-                    this.clients$.subscribe(clients => {
-                        this.selectedClient = clients.find(c => c.id == id);
-                    });
-                }
-                this._changeDetectorRef.markForCheck();
-            });
+        const searchValue = this.searchInputControl.value?.trim();
+        const body: any = {};
+        if (searchValue) {
+            body.full_name = searchValue;
+            if (/^\d+$/.test(searchValue)) {
+                body.cedula = searchValue;
+            }
+        }
+        const request$ = searchValue
+            ? this._clientsService.searchClients(body, this.pageSize, this.page * this.pageSize)
+            : this._clientsService.getClients(this.pageSize, this.page * this.pageSize);
+
+        request$.subscribe(response => {
+            this.clientsCount = response.count;
+            this.clients$ = of(response.results);
+            this._changeDetectorRef.markForCheck();
+        });
     }
 
     get pageIndex(): number {
