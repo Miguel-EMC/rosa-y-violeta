@@ -21,7 +21,7 @@
                 <button
                     mat-flat-button
                     color="primary"
-                    (click)="createProduct()"
+                    (click)="onCreateProduct()"
                     class="h-12 px-6 rounded-xl shadow bg-pink-600 hover:bg-pink-700 text-white font-semibold text-base transition-colors flex items-center gap-2">
                     <mat-icon [svgIcon]="'heroicons_outline:plus'" class="text-white"></mat-icon>
                     <span>Agregar nuevo producto</span>
@@ -118,3 +118,9 @@
         (close)="closeModal()"
     ></app-edit-product>
 </div>
+
+<app-add-product-modal
+    *ngIf="showAddProductModal"
+    (cancel)="onAddProductModalCancel()"
+    (add)="onAddProductModalAdd($event)">
+</app-add-product-modal>

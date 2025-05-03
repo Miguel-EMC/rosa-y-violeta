@@ -4,33 +4,39 @@
         <form [formGroup]="form" (ngSubmit)="onAdd()">
             <div class="mb-4">
                 <label>Nombre *</label>
-                <input formControlName="first_name" class="w-full border rounded p-2" required />
+                <input formControlName="first_name" class="w-full border rounded p-2" required placeholder="Nombre del cliente" />
+                <div class="text-xs text-gray-500 mt-1">Ingrese el nombre del cliente.</div>
                 <div *ngIf="form.get('first_name')?.invalid && form.get('first_name')?.touched" class="text-red-500 text-sm">
                     El nombre es obligatorio.
                 </div>
             </div>
             <div class="mb-4">
                 <label>Apellido *</label>
-                <input formControlName="last_name" class="w-full border rounded p-2" required />
+                <input formControlName="last_name" class="w-full border rounded p-2" required placeholder="Apellido del cliente" />
+                <div class="text-xs text-gray-500 mt-1">Ingrese el apellido del cliente.</div>
                 <div *ngIf="form.get('last_name')?.invalid && form.get('last_name')?.touched" class="text-red-500 text-sm">
                     El apellido es obligatorio.
                 </div>
             </div>
             <div class="mb-2">
                 <label>Cédula</label>
-                <input formControlName="cedula" class="w-full border rounded p-2" />
+                <input formControlName="cedula" class="w-full border rounded p-2" placeholder="Cédula de identidad" />
+                <div class="text-xs text-gray-500 mt-1">Opcional: número de identificación.</div>
             </div>
             <div class="mb-2">
                 <label>Alias</label>
-                <input formControlName="alias" class="w-full border rounded p-2" />
+                <input formControlName="alias" class="w-full border rounded p-2" placeholder="Alias o apodo" />
+                <div class="text-xs text-gray-500 mt-1">Opcional: nombre alternativo.</div>
             </div>
             <div class="mb-2">
                 <label>Dirección</label>
-                <input formControlName="address" class="w-full border rounded p-2" />
+                <input formControlName="address" class="w-full border rounded p-2" placeholder="Dirección del cliente" />
+                <div class="text-xs text-gray-500 mt-1">Opcional: dirección de residencia.</div>
             </div>
             <div class="mb-2">
                 <label>Balance</label>
-                <input formControlName="balance" type="number" class="w-full border rounded p-2" />
+                <input formControlName="balance" type="number" class="w-full border rounded p-2" placeholder="Balance inicial" />
+                <div class="text-xs text-gray-500 mt-1">Opcional: saldo actual del cliente.</div>
             </div>
             <div class="flex justify-end gap-2 mt-6">
                 <button type="button" class="px-4 py-2 bg-gray-200 rounded-lg" (click)="onCancel()">Cancelar</button>
