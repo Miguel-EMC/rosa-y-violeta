@@ -67,6 +67,9 @@ export class ProductsService {
         return this.http.post<Product>(`${this.baseUrl}products/`, product);
     }
 
+    editProduct(productId: number, product: Partial<Product>): Observable<Product> {
+        return this.http.patch<Product>(`${this.baseUrl}products/${productId}/`, product);
+    }
     headProducts(): Observable<any> {
         return this.http.head(`${this.baseUrl}products/`, { observe: 'response' });
     }

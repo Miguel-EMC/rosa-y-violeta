@@ -71,12 +71,19 @@
                                     </ng-template>
                                 </td>
                                 <td class="px-4 py-3 text-center flex gap-2 justify-center">
-                                    <button mat-icon-button color="primary" (click)="openModal(product.id, product.name)"
-                                            class="hover:bg-pink-100 dark:hover:bg-pink-900 rounded-full">
-                                        <mat-icon [svgIcon]="'heroicons_outline:pencil-square'" class="text-pink-600"></mat-icon>
+                                    <!-- Botón para editar producto -->
+                                    <button mat-icon-button color="primary" (click)="openEditProductModal(product.id)"
+                                            class="hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full" matTooltip="Editar producto">
+                                        <mat-icon [svgIcon]="'heroicons_outline:pencil-square'" class="text-blue-600"></mat-icon>
                                     </button>
+                                    <!-- Botón para agregar clientes/personas -->
+                                    <button mat-icon-button color="accent" (click)="openModal(product.id, product.name)"
+                                            class="hover:bg-pink-100 dark:hover:bg-pink-900 rounded-full" matTooltip="Agregar clientes">
+                                        <mat-icon [svgIcon]="'heroicons_outline:user-plus'" class="text-pink-600"></mat-icon>
+                                    </button>
+                                    <!-- Botón para eliminar producto -->
                                     <button mat-icon-button color="warn" (click)="deleteSelectedProduct(product.id)"
-                                            class="hover:bg-red-100 dark:hover:bg-red-900 rounded-full">
+                                            class="hover:bg-red-100 dark:hover:bg-red-900 rounded-full" matTooltip="Eliminar producto">
                                         <mat-icon [svgIcon]="'heroicons_outline:trash'" class="text-red-600"></mat-icon>
                                     </button>
                                 </td>
@@ -110,6 +117,7 @@
     </div>
 </div>
 
+<!-- Modal para agregar clientes -->
 <div class="p-6 z-100">
     <app-edit-product
         [isVisible]="isModalVisible"
@@ -119,8 +127,17 @@
     ></app-edit-product>
 </div>
 
+<!-- Modal para agregar producto -->
 <app-add-product-modal
     *ngIf="showAddProductModal"
     (cancel)="onAddProductModalCancel()"
     (add)="onAddProductModalAdd($event)">
 </app-add-product-modal>
+
+<!-- Modal para editar producto -->
+<app-edit-product-modal
+    *ngIf="showEditProductModal"
+    [productId]="editProductId"
+    (close)="showEditProductModal = false"
+    (updated)="onProductUpdated($event)">
+</app-edit-product-modal>

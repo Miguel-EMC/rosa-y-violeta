@@ -22,7 +22,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ToastrService, ToastNoAnimation } from 'ngx-toastr';
 import { EditProductComponent } from '../edit-product/edit-product.component';
 import {AddProductModalComponent} from "../add-product-modal/add-product-modal.component";
-
+import {EditProductModalComponent} from "../edit-product-modal/edit-product-modal.component";
 @Component({
     selector       : 'inventory-list',
     templateUrl    : './inventory.component.html',
@@ -50,7 +50,7 @@ import {AddProductModalComponent} from "../add-product-modal/add-product-modal.c
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations     : fuseAnimations,
     standalone     : true,
-    imports: [NgIf, MatProgressBarModule, MatFormFieldModule, MatIconModule, MatInputModule, FormsModule, ReactiveFormsModule, MatButtonModule, MatSortModule, NgFor, NgTemplateOutlet, MatPaginatorModule, NgClass, MatSlideToggleModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatRippleModule, AsyncPipe, CurrencyPipe, ToastNoAnimation, EditProductComponent, AddProductModalComponent],
+    imports: [NgIf, MatProgressBarModule, MatFormFieldModule, MatIconModule, MatInputModule, FormsModule, ReactiveFormsModule, MatButtonModule, MatSortModule, NgFor, NgTemplateOutlet, MatPaginatorModule, NgClass, MatSlideToggleModule, MatSelectModule, MatOptionModule, MatCheckboxModule, MatRippleModule, AsyncPipe, CurrencyPipe, ToastNoAnimation, EditProductComponent, AddProductModalComponent, EditProductModalComponent],
 })
 export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
 {
@@ -92,6 +92,10 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
 
     /*** Variables to add new product ***/
     showAddProductModal = false;
+
+    /*** Variables to edit product ***/
+    showEditProductModal = false;
+    editProductId: number | null = null;
 
     /**
      * Constructor
@@ -374,6 +378,20 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
 
+    /*** Edit product ***/
+    openEditProductModal(productId: number) {
+        this.editProductId = productId;
+        this.showEditProductModal = true;
+        this._changeDetectorRef.markForCheck();
+    }
+
+    onProductUpdated(updatedProduct: Product) {
+        const index = this.externalProducts.findIndex(p => p.id === updatedProduct.id);
+        if (index !== -1) {
+            this.externalProducts[index] = { ...this.externalProducts[index], ...updatedProduct };
+            this._changeDetectorRef.markForCheck();
+        }
+    }
 
 
     /**
