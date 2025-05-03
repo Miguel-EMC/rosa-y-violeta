@@ -2,17 +2,158 @@
 /*  @ Import/write your custom styles here.
 /*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
 /* ----------------------------------------------------------------------------------------------------- */
-fuse-vertical-navigation,
-fuse-vertical-navigation * {
-    background-color: #3b0764 !important; /* Deep purple */
-    color: #fff !important;               /* White text */
+
+// Option 1
+
+//fuse-vertical-navigation,
+//fuse-vertical-navigation * {
+//    background-color: #232347 !important; /* Deep navy */
+//    color: #ffffff !important;            /* White text */
+//}
+
+// Option 2
+//fuse-vertical-navigation,
+//fuse-vertical-navigation * {
+//    background-color: #373F51 !important; /* Deep navy */
+//    color: #ffffff !important;            /* White text */
+//}
+
+//* Fondo principal del menú */
+/* === Fondo principal del menú === */
+
+// Variables de diseño
+$color-primary: #EC0774;
+$color-bg: #ffffff;
+$color-text-dark: #111;
+$color-text-light: #222;
+$color-hover-bg: rgba(236, 7, 116, 0.1); // Rosa claro con transparencia
+$color-scrollbar-track: #f9f9f9;
+$font-family: 'Segoe UI', sans-serif;
+
+
+
+.fuse-vertical-navigation-wrapper {
+    background: $color-bg !important;
+    color: $color-text-dark !important;
+    font-family: $font-family;
+
+    // Items del menú
+    .fuse-vertical-navigation-item-wrapper a {
+        transition: background 0.2s ease;
+        &:hover {
+            background: $color-hover-bg !important;
+        }
+    }
+
+    // Estado activo
+    .fuse-vertical-navigation-item-active a {
+        background: $color-primary !important;
+        color: #fff !important;
+        font-weight: 600;
+        border-left: 3px solid $color-primary;
+    }
+
+    // Títulos y subtítulos
+    .fuse-vertical-navigation-item-title {
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    .fuse-vertical-navigation-item-subtitle.ng-star-inserted {
+        font-size: 12px;
+        color: $color-text-light !important;
+        margin-top: 4px;
+        display: block;
+        opacity: 0.8;
+    }
+
+    // Iconos
+    .mat-icon {
+        color: $color-primary !important;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: rgba(236, 7, 116, 0.8) !important;
+        }
+    }
+
+    // Estado activo en iconos
+    .fuse-vertical-navigation-item-active a .mat-icon {
+        color: #fff !important;
+    }
+
+    // Encabezado (preservado sin cambios)
+    .fuse-vertical-navigation-content-header {
+        background: transparent !important;
+        color: inherit !important;
+        padding: 16px 24px;
+    }
+
+    // Footer
+    .fuse-vertical-navigation-content-footer {
+        background: $color-bg !important;
+        border-top: 1px solid #eee;
+    }
+
+    // Scrollbar personalizada
+    .fuse-vertical-navigation-content.ps--active-y {
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: $color-primary $color-scrollbar-track;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: $color-scrollbar-track;
+            border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: $color-primary;
+            border-radius: 3px;
+            border: 1px solid $color-scrollbar-track;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: darken($color-primary, 10%);
+        }
+    }
 }
 
-/* Hide scrollbars */
-fuse-vertical-navigation ::-webkit-scrollbar {
-    display: none !important;
+
+// Variables (ya definidas en tu SCSS)
+$color-primary: #EC0774; // Rosa principal
+$color-bg: #ffffff; // Fondo blanco
+$scrollbar-thumb-color: #EC0774; // Rosadito (puedes cambiar a #ffffff para blanco)
+
+// Estilos específicos para la barra de scroll
+.ps__rail-y {
+    right: 0 !important;
+    width: 4px !important; // Más delgada que antes (antes 6px)
+    background: rgba(0, 0, 0, 0.05) !important; // Fondo sutil
+
+    .ps__thumb-y {
+        background: $scrollbar-thumb-color !important;
+        width: 4px !important;
+        border-radius: 2px !important;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: darken($scrollbar-thumb-color, 10%) !important; // Oscurece un poco al pasar el mouse
+        }
+    }
 }
-fuse-vertical-navigation {
-    -ms-overflow-style: none !important;
-    scrollbar-width: none !important;
+
+// Para WebKit (Chrome, Safari)
+.fuse-vertical-navigation-content.ps--active-y::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+.fuse-vertical-navigation-content.ps--active-y::-webkit-scrollbar-thumb {
+    background: $scrollbar-thumb-color !important;
+    border-radius: 2px !important;
+    border: 1px solid #f9f9f9 !important; // Borde para separar del track
 }

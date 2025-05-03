@@ -2,7 +2,8 @@
     <div class="w-full max-w-[98%] mx-auto p-4 md:p-6 flex flex-col flex-1">
         <!-- Encabezado moderno -->
         <div class="flex flex-col gap-6 mb-8">
-            <div class="text-4xl font-extrabold tracking-tight text-transparent bg-gradient-to-r from-pink-600 to-pink-400 bg-clip-text text-center">
+            <div
+                class="text-4xl font-extrabold tracking-tight text-transparent bg-gradient-to-r from-pink-600 to-pink-400 bg-clip-text text-center">
                 Inventario
             </div>
             <div class="flex flex-col sm:flex-row sm:justify-center items-center gap-4">
@@ -30,7 +31,8 @@
         </div>
 
         <!-- Tabla -->
-        <div class="overflow-hidden rounded-2xl border border-pink-200 dark:border-pink-700 bg-white dark:bg-gray-900 shadow">
+        <div
+            class="overflow-hidden rounded-2xl border border-pink-200 dark:border-pink-700 bg-white dark:bg-gray-900 shadow">
             <ng-container *ngIf="externalProducts as products">
                 <ng-container *ngIf="products.length > 0; else noProducts">
                     <div class="overflow-x-auto">
@@ -39,14 +41,23 @@
                             <tr class="bg-gradient-to-r from-pink-600/80 to-pink-400/80 dark:from-pink-900 dark:to-pink-700">
                                 <th class="px-4 py-3 text-left font-bold text-white uppercase tracking-wider">ID</th>
                                 <th class="px-4 py-3 text-left font-bold text-white uppercase tracking-wider">SKU</th>
-                                <th class="px-4 py-3 text-left font-bold text-white uppercase tracking-wider w-2/5">Nombre</th>
+                                <th class="px-4 py-3 text-left font-bold text-white uppercase tracking-wider w-2/5">
+                                    Nombre
+                                </th>
                                 <th class="px-4 py-3 text-left font-bold text-white uppercase tracking-wider">Marca</th>
                                 <th class="px-4 py-3 text-left font-bold text-white uppercase tracking-wider">Talla</th>
-                                <th class="px-4 py-3 text-center font-bold text-white uppercase tracking-wider">Stock</th>
-                                <th class="px-4 py-3 text-right font-bold text-white uppercase tracking-wider">Mayoreo</th>
-                                <th class="px-4 py-3 text-right font-bold text-white uppercase tracking-wider">Unitario</th>
-                                <th class="px-4 py-3 text-center font-bold text-white uppercase tracking-wider">Estado</th>
-                                <th class="px-4 py-3 text-center font-bold text-white uppercase tracking-wider">Acciones</th>
+                                <th class="px-4 py-3 text-center font-bold text-white uppercase tracking-wider">Stock
+                                </th>
+                                <th class="px-4 py-3 text-right font-bold text-white uppercase tracking-wider">Mayoreo
+                                </th>
+                                <th class="px-4 py-3 text-right font-bold text-white uppercase tracking-wider">
+                                    Unitario
+                                </th>
+                                <th class="px-4 py-3 text-center font-bold text-white uppercase tracking-wider">Estado
+                                </th>
+                                <th class="px-4 py-3 text-center font-bold text-white uppercase tracking-wider">
+                                    Acciones
+                                </th>
                             </tr>
                             </thead>
                             <tbody>
@@ -67,23 +78,29 @@
                                     <span *ngIf="product.active; else inactive"
                                           class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
                                     <ng-template #inactive>
-                                        <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-800">Inactivo</span>
+                                        <span
+                                            class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-800">Inactivo</span>
                                     </ng-template>
                                 </td>
                                 <td class="px-4 py-3 text-center flex gap-2 justify-center">
                                     <!-- Botón para editar producto -->
                                     <button mat-icon-button color="primary" (click)="openEditProductModal(product.id)"
-                                            class="hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full" matTooltip="Editar producto">
-                                        <mat-icon [svgIcon]="'heroicons_outline:pencil-square'" class="text-blue-600"></mat-icon>
+                                            class="hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full"
+                                            matTooltip="Editar producto">
+                                        <mat-icon [svgIcon]="'heroicons_outline:pencil-square'"
+                                                  class="text-blue-600"></mat-icon>
                                     </button>
                                     <!-- Botón para agregar clientes/personas -->
                                     <button mat-icon-button color="accent" (click)="openModal(product.id, product.name)"
-                                            class="hover:bg-pink-100 dark:hover:bg-pink-900 rounded-full" matTooltip="Agregar clientes">
-                                        <mat-icon [svgIcon]="'heroicons_outline:user-plus'" class="text-pink-600"></mat-icon>
+                                            class="hover:bg-pink-100 dark:hover:bg-pink-900 rounded-full"
+                                            matTooltip="Agregar clientes">
+                                        <mat-icon [svgIcon]="'heroicons_outline:user-plus'"
+                                                  class="text-pink-600"></mat-icon>
                                     </button>
                                     <!-- Botón para eliminar producto -->
                                     <button mat-icon-button color="warn" (click)="deleteSelectedProduct(product.id)"
-                                            class="hover:bg-red-100 dark:hover:bg-red-900 rounded-full" matTooltip="Eliminar producto">
+                                            class="hover:bg-red-100 dark:hover:bg-red-900 rounded-full"
+                                            matTooltip="Eliminar producto">
                                         <mat-icon [svgIcon]="'heroicons_outline:trash'" class="text-red-600"></mat-icon>
                                     </button>
                                 </td>
@@ -94,7 +111,9 @@
                 </ng-container>
             </ng-container>
             <ng-template #noProducts>
-                <div class="p-12 text-2xl font-semibold text-center text-pink-300 dark:text-pink-500">¡No hay productos!</div>
+                <div class="p-12 text-2xl font-semibold text-center text-pink-300 dark:text-pink-500">¡No hay
+                    productos!
+                </div>
             </ng-template>
         </div>
         <div class="flex justify-end items-center gap-2 mt-4">
@@ -118,14 +137,12 @@
 </div>
 
 <!-- Modal para agregar clientes -->
-<div class="p-6 z-100">
-    <app-edit-product
-        [isVisible]="isModalVisible"
-        [productId]="productId"
-        [nameProduct]="nameProduct"
-        (close)="closeModal()"
-    ></app-edit-product>
-</div>
+<app-edit-product
+    [isVisible]="isModalVisible"
+    [productId]="productId"
+    [nameProduct]="nameProduct"
+    (close)="closeModal()"
+></app-edit-product>
 
 <!-- Modal para agregar producto -->
 <app-add-product-modal
