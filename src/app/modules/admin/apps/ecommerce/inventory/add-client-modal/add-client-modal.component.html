@@ -1,0 +1,41 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-lg">
+        <h2 class="text-xl font-bold mb-4">Añadir nuevo cliente</h2>
+        <form [formGroup]="form" (ngSubmit)="onAdd()">
+            <div class="mb-4">
+                <label>Nombre *</label>
+                <input formControlName="first_name" class="w-full border rounded p-2" required />
+                <div *ngIf="form.get('first_name')?.invalid && form.get('first_name')?.touched" class="text-red-500 text-sm">
+                    El nombre es obligatorio.
+                </div>
+            </div>
+            <div class="mb-4">
+                <label>Apellido *</label>
+                <input formControlName="last_name" class="w-full border rounded p-2" required />
+                <div *ngIf="form.get('last_name')?.invalid && form.get('last_name')?.touched" class="text-red-500 text-sm">
+                    El apellido es obligatorio.
+                </div>
+            </div>
+            <div class="mb-2">
+                <label>Cédula</label>
+                <input formControlName="cedula" class="w-full border rounded p-2" />
+            </div>
+            <div class="mb-2">
+                <label>Alias</label>
+                <input formControlName="alias" class="w-full border rounded p-2" />
+            </div>
+            <div class="mb-2">
+                <label>Dirección</label>
+                <input formControlName="address" class="w-full border rounded p-2" />
+            </div>
+            <div class="mb-2">
+                <label>Balance</label>
+                <input formControlName="balance" type="number" class="w-full border rounded p-2" />
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" class="px-4 py-2 bg-gray-200 rounded-lg" (click)="onCancel()">Cancelar</button>
+                <button type="submit" class="px-4 py-2 bg-pink-600 text-white rounded-lg" [disabled]="form.invalid">Añadir cliente</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,76 +1,87 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
-// Importa estos módulos de Angular Material:
-import { MatIconModule }   from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { FormsModule } from '@angular/forms';
-import { Client, ProductsService } from 'app/services/products.service';
-import { FuseConfirmationService } from '@fuse/services/confirmation';
-import { ToastrService } from 'ngx-toastr';
-import { FormControl } from '@angular/forms';
-import { debounceTime, switchMap } from 'rxjs/operators';
-import { ClientsService } from 'app/services/clients.service';
-import { finalize } from 'rxjs/operators';
-import { ReactiveFormsModule } from '@angular/forms';
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges
+} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
+import {FormsModule} from '@angular/forms';
+import {Client, ProductsService} from 'app/services/products.service';
+import {FuseConfirmationService} from '@fuse/services/confirmation';
+import {ToastrService} from 'ngx-toastr';
+import {FormControl} from '@angular/forms';
+import {debounceTime} from 'rxjs/operators';
+import {ClientsService} from 'app/services/clients.service';
+import {ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { ViewChild } from '@angular/core';
+import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {ViewChild} from '@angular/core';
+import {AddClientModalComponent} from "../add-client-modal/add-client-modal.component";
 
 @Component({
-  selector: 'app-edit-product',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatIconModule,    // ← para <mat-icon [svgIcon]="…">
-    MatButtonModule,  // ← para mat-flat-button, mat-icon-button
-    FormsModule,
-    ReactiveFormsModule,
-    MatAutocompleteModule
-  ],
-  templateUrl: './edit-product.component.html',
-  styleUrl: './edit-product.component.scss'
+    selector: 'app-edit-product',
+    standalone: true,
+    imports: [
+        CommonModule,
+        MatIconModule,
+        MatButtonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatAutocompleteModule,
+        AddClientModalComponent
+    ],
+    templateUrl: './edit-product.component.html',
+    styleUrl: './edit-product.component.scss'
 })
 export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
-  @Input() isVisible: boolean = false;
-  @Output() close = new EventEmitter<void>();
-  @Input() productId: number;
-  @Input() nameProduct: string = '';
-  @ViewChild(MatAutocompleteTrigger) autocompleteTrigger: MatAutocompleteTrigger;
-  @ViewChild('searchInput') searchInput: any;
+    @Input() isVisible: boolean = false;
+    @Output() close = new EventEmitter<void>();
+    @Input() productId: number;
+    @Input() nameProduct: string = '';
+    @ViewChild(MatAutocompleteTrigger) autocompleteTrigger: MatAutocompleteTrigger;
+    @ViewChild('searchInput') searchInput: any;
 
-  productNum: number = 0;
-  stringName: string = '';
-  quantity: number = 1;
-  listClients: Client[] = [];
-  copyListClients: Client[] = [];
-  isLoadingClients: boolean = true;
-  isLoading: boolean = false;
+    productNum: number = 0;
+    stringName: string = '';
+    quantity: number = 1;
+    listClients: Client[] = [];
+    copyListClients: Client[] = [];
+    isLoadingClients: boolean = true;
+    isLoading: boolean = false;
 
 
-  /*** Search Clients ***/
-  userResults: any[] = [];
-  userHasMore = false;
-  userLoading = false;
-  userSkip = 0;
-  userTake = 10;
-  lastSearchText = '';
-  public searchUserControl: FormControl = new FormControl('');
-  productUnitPrice: string = '0.00';
-  productStock: number = 0;
-  originalProductStock: number = 0;
+    /*** Search Clients ***/
+    userResults: any[] = [];
+    userHasMore = false;
+    userLoading = false;
+    userSkip = 0;
+    userTake = 10;
+    lastSearchText = '';
+    public searchUserControl: FormControl = new FormControl('');
+    productUnitPrice: string = '0.00';
+    productStock: number = 0;
+    originalProductStock: number = 0;
 
+    /*** Add new client ***/
+    showAddClientModal = false;
 
 
     constructor(
-    private _productsService: ProductsService,
-    private _changeDetectorRef: ChangeDetectorRef,
-    private _fuseConfirmationService: FuseConfirmationService,
-    private toastr: ToastrService,
-    private _clientsService: ClientsService
-  )
-  {
-  }
+        private _productsService: ProductsService,
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _fuseConfirmationService: FuseConfirmationService,
+        private toastr: ToastrService,
+        private _clientsService: ClientsService
+    ) {
+    }
 
     ngOnInit(): void {
         this.searchUserControl.valueChanges
@@ -100,7 +111,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
 
     loadUsers(text: string, reset = false) {
         this.userLoading = true;
-        this._clientsService.searchClients({ full_name: text }, this.userTake, this.userSkip)
+        this._clientsService.searchClients({full_name: text}, this.userTake, this.userSkip)
             .subscribe(res => {
                 const newUsers = res.results;
                 if (reset) {
@@ -133,6 +144,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
                 });
             });
     }
+
     displayUser(user: any): string {
         return user && user.full_name ? user.full_name : '';
     }
@@ -142,29 +154,31 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         this.loadUsers(this.lastSearchText, false);
     }
 
-  ngAfterViewInit(): void {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    //Iniciar solo cuando el modal sea visible
-      if (changes['isVisible'] && changes['isVisible'].currentValue === true) {
-      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-      document.body.style.overflow = 'hidden';
-      document.body.style.paddingRight = `${scrollBarWidth}px`;
-          if (this.productId !== undefined) {
-              this.productNum = this.productId;
-              this.getClients(this.productNum);
-              this.loadProductDetails(this.productNum);
-          }
-
-      if (this.nameProduct !== undefined) {
-        this.stringName = this.nameProduct;
-      }
-
-    } else if (changes['isVisible'] && changes['isVisible'].currentValue === false) {
-      document.body.style.overflow = 'auto';
-      document.body.style.paddingRight = '0px';
+    ngAfterViewInit(): void {
     }
-  }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        //Iniciar solo cuando el modal sea visible
+        if (changes['isVisible'] && changes['isVisible'].currentValue === true) {
+            const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+            document.body.style.overflow = 'hidden';
+            document.body.style.paddingRight = `${scrollBarWidth}px`;
+            if (this.productId !== undefined) {
+                this.productNum = this.productId;
+                this.getClients(this.productNum);
+                this.loadProductDetails(this.productNum);
+            }
+
+            if (this.nameProduct !== undefined) {
+                this.stringName = this.nameProduct;
+            }
+
+        } else if (changes['isVisible'] && changes['isVisible'].currentValue === false) {
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '0px';
+        }
+    }
+
     onUserSelected(event: any): void {
         const user = event.option.value;
         if (!this.listClients.some(c => c.client_id === user.id)) {
@@ -186,7 +200,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         this.searchUserControl.setValue('');
     }
 
-  //Servicio: obtener clientes por producto
+    //Servicio: obtener clientes por producto
     getClients(id: number): void {
         this.isLoadingClients = true;
         this._productsService.getClientsForProduct(id).subscribe({
@@ -211,7 +225,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         });
     }
 
-  //Servicio: obtener clientes por producto
+    //Servicio: obtener clientes por producto
     sendClientsForProduct(): void {
         const payload = {
             product_id: this.productNum,
@@ -244,12 +258,12 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
 
-  //Remover clientes de la lista
+    //Remover clientes de la lista
     removeClient(index: number): void {
         const confirmation = this._fuseConfirmationService.open({
             title: 'Vas a eliminar a este usuario',
             message: '¿Estás seguro de querer eliminar al usuario?',
-            actions: { confirm: { label: 'Eliminar' } },
+            actions: {confirm: {label: 'Eliminar'}},
         });
 
         confirmation.afterClosed().subscribe(result => {
@@ -260,9 +274,9 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         });
     }
 
-  hasChanges(): boolean {
-    return JSON.stringify(this.listClients) !== JSON.stringify(this.copyListClients);
-  }
+    hasChanges(): boolean {
+        return JSON.stringify(this.listClients) !== JSON.stringify(this.copyListClients);
+    }
 
     get remainingStock(): number {
         const used = this.listClients.reduce((sum, c) => sum + c.quantity, 0);
@@ -270,11 +284,11 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
 
-  closeModal(): void {
-    this.isVisible = false;
-    document.body.style.overflow = 'auto';
-    this.close.emit();
-  }
+    closeModal(): void {
+        this.isVisible = false;
+        document.body.style.overflow = 'auto';
+        this.close.emit();
+    }
 
     decreaseClientQuantity(i: number): void {
         const c = this.listClients[i];
@@ -300,6 +314,52 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
             client.quantity = 1;
         }
         client.total_price = (parseFloat(client.unit_price) * client.quantity).toFixed(2);
+    }
+
+    /*** Add new client ***/
+    onAddNewClient() {
+        this.showAddClientModal = true;
+    }
+
+    onAddClientModalCancel() {
+        const confirm = this._fuseConfirmationService.open({
+            title: '¿Seguro que quieres cancelar?',
+            message: 'Se perderán los datos ingresados.',
+            actions: { confirm: { label: 'Sí, cancelar' }, cancel: { label: 'No' } }
+        });
+        confirm.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                this.showAddClientModal = false;
+                this._changeDetectorRef.detectChanges();
+            }
+        });
+    }
+
+    onAddClientModalAdd(clientData: any) {
+        this.isLoading = true;
+        this._clientsService.createClient(clientData).subscribe({
+            next: (newClient) => {
+                const quantity = 1;
+                const unit_price = this.productUnitPrice;
+                const total_price = (parseFloat(unit_price) * quantity).toFixed(2);
+                this.listClients.push({
+                    client_id: newClient.id,
+                    client_name: newClient.full_name,
+                    quantity,
+                    unit_price,
+                    total_price
+                });
+                this.showAddClientModal = false;
+                this.isLoading = false;
+                this.toastr.success('Cliente añadido con éxito', 'Éxito');
+                this._changeDetectorRef.detectChanges();
+            },
+            error: () => {
+                this.isLoading = false;
+                this.toastr.error('Error al crear el cliente', 'Error');
+                this._changeDetectorRef.detectChanges();
+            }
+        });
     }
 
 }

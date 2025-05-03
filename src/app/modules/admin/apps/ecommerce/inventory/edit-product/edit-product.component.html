@@ -163,3 +163,9 @@
         </div>
     </div>
 </div>
+
+<app-add-client-modal
+    *ngIf="showAddClientModal"
+    (cancel)="onAddClientModalCancel()"
+    (add)="onAddClientModalAdd($event)">
+</app-add-client-modal>
