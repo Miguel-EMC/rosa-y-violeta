@@ -1,139 +1,165 @@
 <!-- Backdrop -->
 <div
-  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center overflow-y-auto"
-  *ngIf="isVisible"
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center overflow-y-auto"
+    *ngIf="isVisible"
 >
-  <!-- Modal content -->
-  <div class="bg-white rounded-2xl shadow-xl w-[90%] max-w-3xl p-6 m-4">
-    <!-- Close button -->
-    <div class="flex justify-end">
-      <button mat-icon-button (click)="closeModal()">
-        <mat-icon [svgIcon]="'heroicons_outline:x-mark'" class="text-gray-600"></mat-icon>
-      </button>
-    </div>
+    <!-- Modal content -->
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl p-10 m-4 max-h-[95vh] overflow-y-auto transition-all duration-200">
+        <div *ngIf="isLoading || isLoadingClients"
+             class="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 rounded-3xl">
+            <div class="flex flex-col items-center">
+                <div class="w-16 h-16 border-8 border-pink-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <span class="text-pink-700 font-semibold text-lg">Cargando información...</span>
+            </div>
+        </div>
 
-    <!-- Modal Header / Título -->
-    <div class="text-center mb-6">
-      <p class="text-lg font-semibold">{{ nameProduct }}</p>
-    </div>
-
-    <!-- Buscador con lupa -->
-      <div class="flex items-center mb-6 space-x-2">
-          <div class="relative flex-1">
-              <input
-                  #searchInput
-                  type="text"
-                  placeholder="Buscar a un usuario..."
-                  class="w-full border border-gray-300 rounded-md pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  [formControl]="searchUserControl"
-                  [matAutocomplete]="auto"
-              />
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <mat-icon [svgIcon]="'heroicons_solid:magnifying-glass'" class="text-gray-400"></mat-icon>
-              </div>
-              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUser">
-                  <mat-option *ngFor="let user of userResults" [value]="user">
-                      <div>
-                          <span class="font-semibold">{{ user.full_name }}</span>
-                          <span class="text-xs text-gray-500 ml-2">Cédula: {{ user.cedula }}</span>
-                      </div>
-                  </mat-option>
-                  <mat-option
-                      *ngIf="userHasMore"
-                      (mousedown)="$event.preventDefault()"
-                      (click)="loadMoreUsers()"
-                      class="text-blue-600 cursor-pointer"
-                  >
-                      Ver más clientes...
-                  </mat-option>
-              </mat-autocomplete>
-          </div>
-      </div>
-
-
-      <button
-          mat-flat-button
-          color="primary"
-          class="h-10 px-4 rounded-lg shadow-sm bg-blue-600 hover:bg-blue-700 transition-colors"
-      >
-          <mat-icon [svgIcon]="'heroicons_outline:plus'" class="text-white"> Añadir Nuevo Cliente</mat-icon>
-      </button>
-
-    <div class="mb-2">
-        <h3 class="text-lg font-medium">Seleccion cantidad</h3>
-    </div>
-
-    <!-- Placeholder para lista -->
-    <div class="p-4 max-h-40 overflow-y-auto">
-      <!-- Loading -->
-      <div *ngIf="isLoadingClients" class="flex justify-center py-4">
-        <div class="w-6 h-6 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
-      </div>
-
-      <!-- No hay clientes -->
-      <div *ngIf="!isLoadingClients && (!listClients || listClients.length === 0)" class="flex items-center justify-center py-4">
-        <p class="text-gray-500 text-sm">Aún no has añadido clientes.</p>
-      </div>
-
-      <!-- Lista de clientes con control de cantidad -->
-      <ul *ngIf="!isLoadingClients && listClients?.length > 0" class="space-y-2">
-        <li
-          *ngFor="let client of listClients; let i = index"
-          class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-800 rounded-md"
-        >
-          <!-- Nombre -->
-          <span class="flex-1">{{ client.client_name }}</span>
-          <!-- Control de cantidad -->
-          <div class="flex items-center space-x-2 mr-4">
-            <button
-              mat-icon-button
-              color="primary"
-              (click)="decreaseClientQuantity(i)"
-              class="bg-gray-100 rounded-full hover:bg-gray-200"
-            >
-              <mat-icon [svgIcon]="'heroicons_outline:minus'"></mat-icon>
+        <!-- Close button -->
+        <div class="flex justify-end">
+            <button mat-icon-button (click)="closeModal()">
+                <mat-icon [svgIcon]="'heroicons_outline:x-mark'" class="text-gray-600 text-3xl"></mat-icon>
             </button>
-            <input
-              type="number"
-              [(ngModel)]="client.quantity"
-              (blur)="validateClientQuantity(client)"
-              min="1"
-              class="w-12 text-center border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            />
-            <button
-              mat-icon-button
-              color="primary"
-              (click)="increaseClientQuantity(i)"
-              class="bg-gray-100 rounded-full hover:bg-gray-200"
-            >
-              <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-            </button>
-          </div>
-          <!-- Eliminar cliente -->
-          <button
-            mat-icon-button
-            color="warn"
-            (click)="removeClient(i)"
-            class="hover:bg-red-100 dark:hover:bg-red-900 rounded-full"
-          >
-            <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-          </button>
-        </li>
-      </ul>
-    </div>
-    <!-- Actions -->
-    <div class="mt-6 flex justify-center space-x-2">
-        <!-- Botón Añadir -->
-        <button
-          mat-flat-button
-          color="primary"
-          class="px-6 h-10 rounded-lg shadow-sm bg-blue-600 hover:bg-blue-700 transition-colors"
-          (click)="sendClientsForProduct()"
-          [disabled]="!hasChanges() || isLoading"
-        >
-          {{ isLoading ? 'Enviando...' : 'Añadir' }}
-        </button>
-    </div>
+        </div>
 
-  </div>
+        <!-- Product Details Card -->
+        <div class="mb-8 p-6 rounded-2xl bg-pink-50 border border-pink-200 flex flex-col sm:flex-row items-center gap-6">
+            <div class="flex-1">
+                <div class="text-3xl font-extrabold text-pink-800">{{ nameProduct }}</div>
+                <div class="text-base text-pink-600 mt-2">ID: {{ productNum }}</div>
+                <div class="text-base text-pink-600 mt-2">Precio unitario: <span class="font-semibold">${{ productUnitPrice }}</span></div>
+            </div>
+        </div>
+
+        <!-- Buscador con lupa mejorado -->
+        <div class="flex flex-col sm:flex-row items-center mb-8 gap-4">
+            <div class="relative flex-1 w-full">
+                <input
+                    #searchInput
+                    type="text"
+                    placeholder="Buscar a un usuario..."
+                    class="w-full border border-gray-300 rounded-xl pl-12 pr-12 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
+                    [formControl]="searchUserControl"
+                    [matAutocomplete]="auto"
+                    [disabled]="userLoading"
+                />
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <mat-icon [svgIcon]="'heroicons_solid:magnifying-glass'" class="text-pink-400 text-xl"></mat-icon>
+                </div>
+                <button
+                    *ngIf="searchUserControl.value"
+                    type="button"
+                    class="absolute inset-y-0 right-0 pr-4 flex items-center"
+                    (click)="searchUserControl.setValue('')"
+                    tabindex="-1"
+                >
+                    <mat-icon [svgIcon]="'heroicons_outline:x-mark'" class="text-gray-400 text-xl"></mat-icon>
+                </button>
+                <div *ngIf="userLoading" class="absolute right-10 top-1/2 -translate-y-1/2">
+                    <div class="w-5 h-5 border-2 border-pink-400 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUser" (optionSelected)="onUserSelected($event)">
+                    <mat-option *ngFor="let user of userResults" [value]="user">
+                        <div>
+                            <span class="font-semibold">{{ user.full_name }}</span>
+                            <span class="text-xs text-gray-500 ml-2">Cédula: {{ user.cedula }}</span>
+                        </div>
+                    </mat-option>
+                    <mat-option
+                        *ngIf="userHasMore"
+                        (mousedown)="$event.preventDefault()"
+                        (click)="loadMoreUsers()"
+                        class="text-pink-600 cursor-pointer"
+                    >
+                        Ver más clientes...
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+            <button
+                mat-flat-button
+                color="primary"
+                class="h-12 px-6 rounded-xl shadow bg-pink-600 hover:bg-pink-700 transition-colors flex items-center gap-2 text-lg"
+                (click)="onAddNewClient()"
+            >
+                <mat-icon [svgIcon]="'heroicons_outline:plus'" class="text-white"></mat-icon>
+                <span class="text-white">Añadir cliente no existente</span>
+            </button>
+        </div>
+
+        <!-- Lista de clientes en tabla -->
+        <div class="mb-6">
+            <h3 class="text-2xl font-semibold mb-4">Clientes asignados</h3>
+            <div *ngIf="!isLoadingClients && (!listClients || listClients.length === 0)" class="flex items-center justify-center py-8">
+                <p class="text-gray-400 text-lg">Aún no has añadido clientes.</p>
+            </div>
+            <div *ngIf="!isLoadingClients && listClients?.length > 0" class="overflow-x-auto">
+                <table class="min-w-full text-base border border-gray-200 rounded-2xl">
+                    <thead>
+                    <tr class="bg-pink-100 text-pink-800 text-lg">
+                        <th class="px-5 py-4 text-left">Cliente</th>
+                        <th class="px-5 py-4 text-center">Cantidad</th>
+                        <th class="px-5 py-4 text-right">Precio unitario</th>
+                        <th class="px-5 py-4 text-right">Total</th>
+                        <th class="px-5 py-4 text-center">Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let client of listClients; let i = index" class="border-t" [hidden]="client.toRemove">
+                        <td class="px-5 py-4 font-semibold">{{ client.client_name }}</td>
+                        <td class="px-5 py-4 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <button
+                                    mat-icon-button
+                                    color="primary"
+                                    (click)="decreaseClientQuantity(i)"
+                                    class="bg-gray-100 rounded-full hover:bg-gray-200"
+                                >
+                                    <mat-icon [svgIcon]="'heroicons_outline:minus'"></mat-icon>
+                                </button>
+                                <input
+                                    type="number"
+                                    [(ngModel)]="client.quantity"
+                                    (blur)="validateClientQuantity(client)"
+                                    min="1"
+                                    class="w-16 text-center border border-gray-300 rounded-md p-2 text-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                                />
+                                <button
+                                    mat-icon-button
+                                    color="primary"
+                                    (click)="increaseClientQuantity(i)"
+                                    class="bg-gray-100 rounded-full hover:bg-gray-200"
+                                >
+                                    <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="px-5 py-4 text-right">${{ client.unit_price }}</td>
+                        <td class="px-5 py-4 text-right font-bold">${{ client.total_price }}</td>
+                        <td class="px-5 py-4 text-center">
+                            <button
+                                mat-icon-button
+                                color="warn"
+                                (click)="removeClient(i)"
+                                class="hover:bg-red-100 dark:hover:bg-red-900 rounded-full"
+                            >
+                                <mat-icon [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="mt-8 flex justify-center space-x-4">
+            <button
+                mat-flat-button
+                color="primary"
+                class="px-10 h-14 rounded-xl shadow bg-pink-600 hover:bg-pink-700 transition-colors text-xl"
+                (click)="sendClientsForProduct()"
+                [disabled]="!hasChanges() || isLoading"
+            >
+                {{ isLoading ? 'Enviando...' : 'Añadir' }}
+            </button>
+        </div>
+    </div>
 </div>

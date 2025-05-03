@@ -55,6 +55,10 @@ export class ProductsService {
         );
     }
 
+    getProductById(productId: number): Observable<Product> {
+        return this.http.get<Product>(`${this.baseUrl}products/${productId}/`);
+    }
+
     notifyProductsUpdated() {
         this.productsUpdatedSource.next();
     }

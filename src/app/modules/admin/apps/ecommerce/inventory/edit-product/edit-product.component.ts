@@ -56,9 +56,13 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
   userTake = 10;
   lastSearchText = '';
   public searchUserControl: FormControl = new FormControl('');
+  productUnitPrice: string = '0.00';
+  productStock: number = 0;
+  originalProductStock: number = 0;
 
 
-  constructor(
+
+    constructor(
     private _productsService: ProductsService,
     private _changeDetectorRef: ChangeDetectorRef,
     private _fuseConfirmationService: FuseConfirmationService,
@@ -77,6 +81,21 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
                 this.userResults = [];
                 this.loadUsers(text, true);
             });
+        if (this.productId) {
+            this.productNum = this.productId;
+            this.loadProductDetails(this.productNum);
+        }
+    }
+
+    loadProductDetails(productId: number): void {
+        this._productsService.getProductById(productId).subscribe(product => {
+            if (product) {
+                this.productUnitPrice = product.unit_price;
+                this.productStock = product.stock;
+                this.originalProductStock = product.stock;
+            }
+            this._changeDetectorRef.detectChanges();
+        });
     }
 
     loadUsers(text: string, reset = false) {
@@ -86,11 +105,19 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
                 const newUsers = res.results;
                 if (reset) {
                     this.userResults = newUsers.map(u => ({
+                        id: u.id,
                         full_name: u.full_name,
                         cedula: u.cedula
                     }));
                 } else {
-                    this.userResults = [...this.userResults, ...newUsers];
+                    this.userResults = [
+                        ...this.userResults,
+                        ...newUsers.map(u => ({
+                            id: u.id,
+                            full_name: u.full_name,
+                            cedula: u.cedula
+                        }))
+                    ];
                 }
                 this.userHasMore = (this.userResults.length < res.count);
                 this.userLoading = false;
@@ -119,16 +146,15 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     //Iniciar solo cuando el modal sea visible
-    if (changes['isVisible'] && changes['isVisible'].currentValue === true) {
+      if (changes['isVisible'] && changes['isVisible'].currentValue === true) {
       const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollBarWidth}px`;
-
-      // 🔥 Solo cuando el modal se abre
-      if (this.productId !== undefined) {
-        this.productNum = this.productId;
-        this.getClients(this.productNum);
-      }
+          if (this.productId !== undefined) {
+              this.productNum = this.productId;
+              this.getClients(this.productNum);
+              this.loadProductDetails(this.productNum);
+          }
 
       if (this.nameProduct !== undefined) {
         this.stringName = this.nameProduct;
@@ -139,83 +165,109 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
       document.body.style.paddingRight = '0px';
     }
   }
+    onUserSelected(event: any): void {
+        const user = event.option.value;
+        if (!this.listClients.some(c => c.client_id === user.id)) {
+            const quantity = 1;
+            const unit_price = this.productUnitPrice;
+            const total_price = (parseFloat(unit_price) * quantity).toFixed(2);
+            this.listClients.push({
+                client_id: user.id,
+                client_name: user.full_name,
+                quantity,
+                unit_price,
+                total_price
+            });
+            this._changeDetectorRef.detectChanges();
+            this.toastr.success('Cliente añadido con éxito', 'Éxito');
+        } else {
+            this.toastr.error('Este cliente ya está agregado.', 'Error');
+        }
+        this.searchUserControl.setValue('');
+    }
 
   //Servicio: obtener clientes por producto
-  getClients(id: number): void{
-      this.isLoadingClients = true;
-      this._productsService.getClientsForProduct(id).subscribe({
-        next: (clients) => {
-          this.listClients = clients.clients || [];
-          this.copyListClients = JSON.parse(JSON.stringify(this.listClients));
-          this.isLoadingClients = false;
-          this._changeDetectorRef.detectChanges();
-      },
-      error: (err) => {
-        this.isLoadingClients = false;
-        console.error('Error al obtener clientes:', err);
-        this._changeDetectorRef.detectChanges();
-      }
-      })
-  }
+    getClients(id: number): void {
+        this.isLoadingClients = true;
+        this._productsService.getClientsForProduct(id).subscribe({
+            next: (res) => {
+                const clients = res.clients || [];
+                this.listClients = clients;
+                this.copyListClients = JSON.parse(JSON.stringify(clients));
+                clients.forEach((client, idx) => {
+                    this._clientsService.getClientById(client.client_id).subscribe(clientData => {
+                        this.listClients[idx].client_name = clientData.full_name;
+                        this._changeDetectorRef.detectChanges();
+                    });
+                });
+                this.isLoadingClients = false;
+                this._changeDetectorRef.detectChanges();
+            },
+            error: (err) => {
+                this.isLoadingClients = false;
+                console.error('Error al obtener clientes:', err);
+                this._changeDetectorRef.detectChanges();
+            }
+        });
+    }
 
   //Servicio: obtener clientes por producto
-  sendClientsForProduct(): void {
-    // Construir el body
-    const payload = {
-      product_id: this.productNum,
-      clients: this.listClients.map(client => ({
-        client_id: client.client_id,
-        quantity: client.quantity,
-        unit_price: client.unit_price,
-        total_price: client.total_price
-      })),
-      is_active: true
-    };
-
-    console.log('Enviando payload:', payload);
-    console.log('Se envia esta lista',this.listClients);
-
-    this.isLoading = true;
-    this._productsService.sendClientsForProduct(this.productNum, payload).subscribe({
-      next: (response) => {
-        this.toastr.success('Clienes registrados al producto exitosamente', 'Aviso');
-        this.isLoading = false;
-        this._productsService.notifyProductsUpdated();
-        this.closeModal();
-        this._changeDetectorRef.detectChanges();
-      },
-      error: (err) => {
-        this.toastr.error('Hubo un error al registrar al cliente', 'Error');
-        this.isLoading = false;
-        this._changeDetectorRef.detectChanges();
-      }
-    });
-  }
+    sendClientsForProduct(): void {
+        const payload = {
+            product_id: this.productNum,
+            clients: this.listClients
+                .filter(client => !client['toRemove'])
+                .map(client => ({
+                    client_id: client.client_id,
+                    quantity: client.quantity,
+                    unit_price: client.unit_price,
+                    total_price: client.total_price
+                })),
+            is_active: true
+        };
+        this.isLoading = true;
+        this._productsService.sendClientsForProduct(this.productNum, payload).subscribe({
+            next: (response) => {
+                this.toastr.success('Clienes registrados al producto exitosamente', 'Aviso');
+                this.isLoading = false;
+                this._productsService.notifyProductsUpdated();
+                this.loadProductDetails(this.productNum);
+                this.closeModal();
+                this._changeDetectorRef.detectChanges();
+            },
+            error: (err) => {
+                this.toastr.error('Hubo un error al registrar al cliente', 'Error');
+                this.isLoading = false;
+                this._changeDetectorRef.detectChanges();
+            }
+        });
+    }
 
 
   //Remover clientes de la lista
-  removeClient(index: number): void {
-    const confirmation = this._fuseConfirmationService.open({
-      title  : 'Vas a eliminar a este usuario',
-      message: '¿Estás seguro de querer eliminar al usuario?',
-      actions: {
-          confirm: {
-              label: 'Eliminar',
-          },
-      },
-    });
+    removeClient(index: number): void {
+        const confirmation = this._fuseConfirmationService.open({
+            title: 'Vas a eliminar a este usuario',
+            message: '¿Estás seguro de querer eliminar al usuario?',
+            actions: { confirm: { label: 'Eliminar' } },
+        });
 
-    confirmation.afterClosed().subscribe(result => {
-      if ( result === 'confirmed' ){
-        this.listClients.splice(index, 1);
-        this._changeDetectorRef.detectChanges();
-      }
-   });
-  }
+        confirmation.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                this.listClients[index]['toRemove'] = true;
+                this._changeDetectorRef.detectChanges();
+            }
+        });
+    }
 
   hasChanges(): boolean {
     return JSON.stringify(this.listClients) !== JSON.stringify(this.copyListClients);
   }
+
+    get remainingStock(): number {
+        const used = this.listClients.reduce((sum, c) => sum + c.quantity, 0);
+        return this.originalProductStock - used;
+    }
 
 
   closeModal(): void {
@@ -224,21 +276,30 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
     this.close.emit();
   }
 
-  decreaseClientQuantity(i: number): void {
-    const c = this.listClients[i];
-    if (c.quantity > 1) {
-      c.quantity--;
+    decreaseClientQuantity(i: number): void {
+        const c = this.listClients[i];
+        if (c.quantity > 1) {
+            c.quantity--;
+            c.total_price = (parseFloat(c.unit_price) * c.quantity).toFixed(2);
+        }
     }
-  }
 
-  increaseClientQuantity(i: number): void {
-    this.listClients[i].quantity++;
-  }
-
-  validateClientQuantity(client: Client): void {
-    if (!client.quantity || client.quantity < 1) {
-      client.quantity = 1;
+    increaseClientQuantity(i: number): void {
+        if (this.remainingStock > 0) {
+            const c = this.listClients[i];
+            c.quantity++;
+            c.total_price = (parseFloat(c.unit_price) * c.quantity).toFixed(2);
+            this._changeDetectorRef.detectChanges();
+        } else {
+            this.toastr.warning('No hay stock suficiente', 'Aviso');
+        }
     }
-  }
+
+    validateClientQuantity(client: Client): void {
+        if (!client.quantity || client.quantity < 1) {
+            client.quantity = 1;
+        }
+        client.total_price = (parseFloat(client.unit_price) * client.quantity).toFixed(2);
+    }
 
 }
