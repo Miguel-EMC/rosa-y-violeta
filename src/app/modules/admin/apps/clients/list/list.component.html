@@ -86,8 +86,7 @@
                                     <ng-container *ngIf="!client.avatar">
                                         <div
                                             class="flex items-center justify-center w-full h-full rounded-full text-2xl font-bold uppercase text-rose-700 dark:text-rose-100">
-                                            {{ client.full_name.charAt(0) }}
-                                        </div>
+                                            {{ client.full_name?.charAt(0) || client.alias }}                                        </div>
                                     </ng-container>
                                 </div>
                                 <div class="flex-1 min-w-0">
@@ -145,3 +144,9 @@
         </mat-drawer-content>
     </mat-drawer-container>
 </div>
+<!-- Add Client Modal -->
+<app-add-client-modal
+    *ngIf="showAddClientModal"
+    (cancel)="onAddClientModalCancel()"
+    (add)="onAddClientModalAdd($event)">
+</app-add-client-modal>
