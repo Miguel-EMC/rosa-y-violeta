@@ -21,6 +21,12 @@ import {CommonModule} from '@angular/common';
 import {MatButtonModule} from "@angular/material/button";
 import {FuseConfirmationService} from "../../../../../../@fuse/services/confirmation";
 import {ToastrService} from "ngx-toastr";
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatInputModule} from "@angular/material/input";
+import {MatRippleModule} from "@angular/material/core";
+import {MatSelectModule} from "@angular/material/select";
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 
 @Component({
@@ -36,13 +42,20 @@ import {ToastrService} from "ngx-toastr";
         NgClass,
         MatTooltipModule,
         CommonModule,
-        MatButtonModule
+        MatButtonModule,
+        ReactiveFormsModule,
+        MatInputModule,
+        MatRippleModule,
+        MatSelectModule,
+        MatDatepickerModule,
+        MatCheckboxModule
     ],
 })
 export class ClientsDetailsComponent implements OnInit {
     @ViewChild('tagsPanel') private _tagsPanel: TemplateRef<any>;
     @ViewChild('tagsPanelOrigin') private _tagsPanelOrigin: ElementRef;
     editMode = false;
+    clientForm: FormGroup;
 
     private _tagsPanelOverlayRef: OverlayRef;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -67,7 +80,8 @@ export class ClientsDetailsComponent implements OnInit {
         private _elementRef: ElementRef,
         private _clientsService: ClientsService,
         private _fuseConfirmationService: FuseConfirmationService,
-        private _toastrService: ToastrService
+        private _toastrService: ToastrService,
+        private fb: FormBuilder,
     ) {
     }
 
@@ -85,10 +99,11 @@ export class ClientsDetailsComponent implements OnInit {
             if (id) {
                 this._clientsService.getClientById(id).subscribe(client => {
                     this.client = client;
+                    this.initForm();
                     this._changeDetectorRef.markForCheck();
                 });
                 this._clientsService.getOrdersByClient(id).subscribe(orders => {
-                    this.orders = orders.results || [];
+                    this.orders = Array.isArray(orders) ? orders : (orders?.results || []);
                     this.pendingOrders = this.orders.filter(o => o.status === 'pending');
                     this.shippedOrders = this.orders.filter(o => o.status === 'shipped' || o.status === 'delivered');
                     this._changeDetectorRef.markForCheck();
@@ -102,11 +117,8 @@ export class ClientsDetailsComponent implements OnInit {
      * On destroy
      */
     ngOnDestroy(): void {
-        // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
-
-        // Dispose the overlays if they are still on the DOM
         if (this._tagsPanelOverlayRef) {
             this._tagsPanelOverlayRef.dispose();
         }
@@ -128,15 +140,11 @@ export class ClientsDetailsComponent implements OnInit {
      *
      * @param editMode
      */
-    toggleEditMode(editMode: boolean | null = null): void {
-        if (editMode === null) {
-            this.editMode = !this.editMode;
-        } else {
-            this.editMode = editMode;
+    toggleEditMode(edit: boolean) {
+        this.editMode = edit;
+        if (edit) {
+            this.initForm();
         }
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
     }
 
 
@@ -145,8 +153,8 @@ export class ClientsDetailsComponent implements OnInit {
             title: 'Eliminar producto',
             message: `¿Estás seguro de que deseas eliminar "${product.product_name}" de esta orden?`,
             actions: {
-                confirm: { label: 'Eliminar' },
-                cancel: { label: 'Cancelar' }
+                confirm: {label: 'Eliminar'},
+                cancel: {label: 'Cancelar'}
             }
         });
         confirmation.afterClosed().subscribe(result => {
@@ -183,8 +191,8 @@ export class ClientsDetailsComponent implements OnInit {
             title: 'Marcar como entregada',
             message: '¿Estás seguro de que deseas marcar esta orden como entregada?',
             actions: {
-                confirm: { label: 'Sí' },
-                cancel: { label: 'No' }
+                confirm: {label: 'Sí'},
+                cancel: {label: 'No'}
             }
         });
 
@@ -201,156 +209,67 @@ export class ClientsDetailsComponent implements OnInit {
         });
     }
 
-    // /**
-    //  * Update the contact
-    //  */
-    // updateContact(): void
-    // {
-    //     // Get the contact object
-    //     const contact = this.contactForm.getRawValue();
-    //
-    //     // Go through the contact object and clear empty values
-    //     contact.emails = contact.emails.filter(email => email.email);
-    //
-    //     contact.phoneNumbers = contact.phoneNumbers.filter(phoneNumber => phoneNumber.phoneNumber);
-    //
-    //     // Update the contact on the server
-    //     this._contactsService.updateContact(contact.id, contact).subscribe(() =>
-    //     {
-    //         // Toggle the edit mode off
-    //         this.toggleEditMode(false);
-    //     });
-    // }
-
-    // /**
-    //  * Delete the contact
-    //  */
-    // deleteContact(): void
-    // {
-    //     // Open the confirmation dialog
-    //     const confirmation = this._fuseConfirmationService.open({
-    //         title  : 'Delete contact',
-    //         message: 'Are you sure you want to delete this contact? This action cannot be undone!',
-    //         actions: {
-    //             confirm: {
-    //                 label: 'Delete',
-    //             },
-    //         },
-    //     });
-    //
-    //     // Subscribe to the confirmation dialog closed action
-    //     confirmation.afterClosed().subscribe((result) =>
-    //     {
-    //         // If the confirm button pressed...
-    //         if ( result === 'confirmed' )
-    //         {
-    //             // Get the current contact's id
-    //             const id = this.contact.id;
-    //
-    //             // Get the next/previous contact's id
-    //             const currentContactIndex = this.contacts.findIndex(item => item.id === id);
-    //             const nextContactIndex = currentContactIndex + ((currentContactIndex === (this.contacts.length - 1)) ? -1 : 1);
-    //             const nextContactId = (this.contacts.length === 1 && this.contacts[0].id === id) ? null : this.contacts[nextContactIndex].id;
-    //
-    //             // Delete the contact
-    //             this._contactsService.deleteContact(id)
-    //                 .subscribe((isDeleted) =>
-    //                 {
-    //                     // Return if the contact wasn't deleted...
-    //                     if ( !isDeleted )
-    //                     {
-    //                         return;
-    //                     }
-    //
-    //                     // Navigate to the next contact if available
-    //                     if ( nextContactId )
-    //                     {
-    //                         this._router.navigate(['../', nextContactId], {relativeTo: this._activatedRoute});
-    //                     }
-    //                     // Otherwise, navigate to the parent
-    //                     else
-    //                     {
-    //                         this._router.navigate(['../'], {relativeTo: this._activatedRoute});
-    //                     }
-    //
-    //                     // Toggle the edit mode off
-    //                     this.toggleEditMode(false);
-    //                 });
-    //
-    //             // Mark for check
-    //             this._changeDetectorRef.markForCheck();
-    //         }
-    //     });
-    //
-    // }
-
+    initForm() {
+        this.clientForm = this.fb.group({
+            balance: [this.client?.balance || '', []],
+            first_name: [this.client?.first_name || '', Validators.required],
+            last_name: [this.client?.last_name || '', Validators.required],
+            alias: [this.client?.alias || ''],
+            cedula: [this.client?.cedula || ''],
+            email: [this.client?.email || ''],
+            cellphone_number: [this.client?.cellphone_number || ''],
+            address: [this.client?.address || '']
+        });
+    }
 
     /**
-     * Open tags panel
+     * Update the contact
      */
-    openTagsPanel(): void {
-        // // Create the overlay
-        // this._tagsPanelOverlayRef = this._overlay.create({
-        //     backdropClass   : '',
-        //     hasBackdrop     : true,
-        //     scrollStrategy  : this._overlay.scrollStrategies.block(),
-        //     positionStrategy: this._overlay.position()
-        //         .flexibleConnectedTo(this._tagsPanelOrigin.nativeElement)
-        //         .withFlexibleDimensions(true)
-        //         .withViewportMargin(64)
-        //         .withLockedPosition(true)
-        //         .withPositions([
-        //             {
-        //                 originX : 'start',
-        //                 originY : 'bottom',
-        //                 overlayX: 'start',
-        //                 overlayY: 'top',
-        //             },
-        //         ]),
-        // });
-        //
-        // // Subscribe to the attachments observable
-        // this._tagsPanelOverlayRef.attachments().subscribe(() =>
-        // {
-        //     // Add a class to the origin
-        //     this._renderer2.addClass(this._tagsPanelOrigin.nativeElement, 'panel-opened');
-        //
-        //     // Focus to the search input once the overlay has been attached
-        //     this._tagsPanelOverlayRef.overlayElement.querySelector('input').focus();
-        // });
-        //
-        // // Create a portal from the template
-        // const templatePortal = new TemplatePortal(this._tagsPanel, this._viewContainerRef);
-        //
-        // // Attach the portal to the overlay
-        // this._tagsPanelOverlayRef.attach(templatePortal);
-        //
-        // // Subscribe to the backdrop click
-        // this._tagsPanelOverlayRef.backdropClick().subscribe(() =>
-        // {
-        //     // Remove the class from the origin
-        //     this._renderer2.removeClass(this._tagsPanelOrigin.nativeElement, 'panel-opened');
-        //
-        //     // If overlay exists and attached...
-        //     if ( this._tagsPanelOverlayRef && this._tagsPanelOverlayRef.hasAttached() )
-        //     {
-        //         // Detach it
-        //         this._tagsPanelOverlayRef.detach();
-        //
-        //         // Reset the tag filter
-        //         this.filteredTags = this.tags;
-        //
-        //         // Toggle the edit mode off
-        //         this.tagsEditMode = false;
-        //     }
-        //
-        //     // If template portal exists and attached...
-        //     if ( templatePortal && templatePortal.isAttached )
-        //     {
-        //         // Detach it
-        //         templatePortal.detach();
-        //     }
-        // });
+    updateContact() {
+        if (this.clientForm.invalid) return;
+        const updatedData = this.clientForm.value;
+        this._clientsService.updateClient(this.client.id, updatedData).subscribe({
+            next: (updatedClient) => {
+                this.client = updatedClient;
+                this.editMode = false;
+                this._toastrService.success('Cliente actualizado con éxito', 'Éxito');
+                this._changeDetectorRef.markForCheck();
+            },
+            error: () => {
+                this._toastrService.error('Error al actualizar el cliente', 'Error');
+                this._changeDetectorRef.markForCheck();
+            }
+        });
+    }
+
+    /**
+     * Delete the client
+     */
+    deleteClient(): void {
+        const confirmation = this._fuseConfirmationService.open({
+            title: 'Eliminar cliente',
+            message: '¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer.',
+            actions: {
+                confirm: {label: 'Eliminar'},
+                cancel: {label: 'Cancelar'}
+            }
+        });
+
+        confirmation.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                this._clientsService.deleteClient(this.client.id).subscribe({
+                    next: () => {
+                        this._toastrService.success('Cliente eliminado con éxito', 'Éxito');
+                        this.closeDrawer().then(() => {
+                            this._clientsListComponent.loadClients()
+                        });
+                    },
+                    error: () => {
+                        this._toastrService.error('Error al eliminar el cliente', 'Error');
+                    }
+                });
+            }
+        });
     }
 
     /**
