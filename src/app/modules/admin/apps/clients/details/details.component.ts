@@ -3,6 +3,7 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    OnInit,
     TemplateRef,
     ViewChild,
     ViewEncapsulation
@@ -11,33 +12,63 @@ import {MatDrawerToggleResult} from "@angular/material/sidenav";
 import {ClientsListComponent} from "../list/list.component";
 import {Subject} from "rxjs";
 import {OverlayRef} from "@angular/cdk/overlay";
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ClientsService} from "../../../../../services/clients.service";
+import {MatIconModule} from "@angular/material/icon";
+import {NgClass, NgIf} from "@angular/common";
+import {MatTooltipModule} from "@angular/material/tooltip";
+import {CommonModule} from '@angular/common';
+import {MatButtonModule} from "@angular/material/button";
+import {FuseConfirmationService} from "../../../../../../@fuse/services/confirmation";
+import {ToastrService} from "ngx-toastr";
 
 
 @Component({
-    selector       : 'clients-details',
-    templateUrl    : './details.component.html',
-    encapsulation  : ViewEncapsulation.None,
+    selector: 'clients-details',
+    templateUrl: './details.component.html',
+    encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone     : true,
-    imports        : [
-
+    standalone: true,
+    imports: [
+        RouterLink,
+        MatIconModule,
+        NgIf,
+        NgClass,
+        MatTooltipModule,
+        CommonModule,
+        MatButtonModule
     ],
 })
-export class ClientsDetailsComponent {
+export class ClientsDetailsComponent implements OnInit {
     @ViewChild('tagsPanel') private _tagsPanel: TemplateRef<any>;
     @ViewChild('tagsPanelOrigin') private _tagsPanelOrigin: ElementRef;
     editMode = false;
 
     private _tagsPanelOverlayRef: OverlayRef;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+
+    /*** Variables of details client ***/
+    client: any = null;
+    orders: any[] = [];
+
+    /*** Variables to Order ***/
+    pendingOrders: any[] = [];
+    shippedOrders: any[] = [];
+    showShipped = false;
+
     //
     /**
      * Constructor
      */
     constructor(
         private _clientsListComponent: ClientsListComponent,
-        private  _changeDetectorRef: ChangeDetectorRef,
-        ) {
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _activatedRoute: ActivatedRoute,
+        private _elementRef: ElementRef,
+        private _clientsService: ClientsService,
+        private _fuseConfirmationService: FuseConfirmationService,
+        private _toastrService: ToastrService
+    ) {
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -49,22 +80,34 @@ export class ClientsDetailsComponent {
      */
     ngOnInit(): void {
         this._clientsListComponent.matDrawer.open();
-
+        this._activatedRoute.params.subscribe(params => {
+            const id = params['id'];
+            if (id) {
+                this._clientsService.getClientById(id).subscribe(client => {
+                    this.client = client;
+                    this._changeDetectorRef.markForCheck();
+                });
+                this._clientsService.getOrdersByClient(id).subscribe(orders => {
+                    this.orders = orders.results || [];
+                    this.pendingOrders = this.orders.filter(o => o.status === 'pending');
+                    this.shippedOrders = this.orders.filter(o => o.status === 'shipped' || o.status === 'delivered');
+                    this._changeDetectorRef.markForCheck();
+                });
+            }
+        });
     }
 
 
     /**
      * On destroy
      */
-    ngOnDestroy(): void
-    {
+    ngOnDestroy(): void {
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
 
         // Dispose the overlays if they are still on the DOM
-        if ( this._tagsPanelOverlayRef )
-        {
+        if (this._tagsPanelOverlayRef) {
             this._tagsPanelOverlayRef.dispose();
         }
     }
@@ -76,8 +119,7 @@ export class ClientsDetailsComponent {
     /**
      * Close the drawer
      */
-    closeDrawer(): Promise<MatDrawerToggleResult>
-    {
+    closeDrawer(): Promise<MatDrawerToggleResult> {
         return this._clientsListComponent.matDrawer.close();
     }
 
@@ -86,19 +128,77 @@ export class ClientsDetailsComponent {
      *
      * @param editMode
      */
-    toggleEditMode(editMode: boolean | null = null): void
-    {
-        if ( editMode === null )
-        {
+    toggleEditMode(editMode: boolean | null = null): void {
+        if (editMode === null) {
             this.editMode = !this.editMode;
-        }
-        else
-        {
+        } else {
             this.editMode = editMode;
         }
 
         // Mark for check
         this._changeDetectorRef.markForCheck();
+    }
+
+
+    confirmRemoveProduct(order: any, product: any, productIndex: number): void {
+        const confirmation = this._fuseConfirmationService.open({
+            title: 'Eliminar producto',
+            message: `¿Estás seguro de que deseas eliminar "${product.product_name}" de esta orden?`,
+            actions: {
+                confirm: { label: 'Eliminar' },
+                cancel: { label: 'Cancelar' }
+            }
+        });
+        confirmation.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                order.products.splice(productIndex, 1);
+                order.total_price = order.products.reduce((sum, p) => sum + (Number(p.quantity) * Number(p.unit_price)), 0).toFixed(2);
+                order.total_to_pay = order.total_price;
+                const payload = {
+                    client_id: order.client_id,
+                    products: order.products.map(p => ({
+                        product_id: p.product_id,
+                        quantity: p.quantity,
+                        unit_price: p.unit_price
+                    })),
+                    total_price: order.total_price,
+                    status: order.status
+                };
+
+                this._clientsService.updateOrdersByClient(order.client_id, payload).subscribe(() => {
+                    this._toastrService.success('¡Producto eliminado y orden actualizada!', 'Éxito');
+                    this._changeDetectorRef.markForCheck();
+                });
+            }
+        });
+    }
+
+    updateOrderTotals(order: any): void {
+        order.total_price = order.products.reduce((sum, p) => sum + p.quantity * p.unit_price, 0);
+        order.total_to_pay = order.total_price;
+    }
+
+    markOrderAsShipped(order: any): void {
+        const confirmation = this._fuseConfirmationService.open({
+            title: 'Marcar como entregada',
+            message: '¿Estás seguro de que deseas marcar esta orden como entregada?',
+            actions: {
+                confirm: { label: 'Sí' },
+                cancel: { label: 'No' }
+            }
+        });
+
+        confirmation.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                order.status = 'shipped';
+                this._clientsService.updateOrdersByClient(this.client.id, order).subscribe(() => {
+                    this.pendingOrders = this.pendingOrders.filter(o => o.id !== order.id);
+                    this.shippedOrders.push(order);
+                    this._toastrService.success('¡Orden marcada como entregada!', 'Éxito');
+                    this._changeDetectorRef.markForCheck();
+                });
+            }
+        });
     }
 
     // /**
@@ -185,13 +285,10 @@ export class ClientsDetailsComponent {
     // }
 
 
-
-
     /**
      * Open tags panel
      */
-    openTagsPanel(): void
-    {
+    openTagsPanel(): void {
         // // Create the overlay
         // this._tagsPanelOverlayRef = this._overlay.create({
         //     backdropClass   : '',
@@ -262,8 +359,7 @@ export class ClientsDetailsComponent {
      * @param index
      * @param item
      */
-    trackByFn(index: number, item: any): any
-    {
+    trackByFn(index: number, item: any): any {
         return item.id || index;
     }
 }

@@ -102,10 +102,16 @@
                                     </div>
                                 </div>
                                 <div class="flex flex-col items-end ml-2">
-                                    <div class="text-lg font-bold text-rose-700 dark:text-rose-200">
-                                        ${{ client.balance }}
-                                    </div>
-                                    <div class="text-xs text-rose-500 mt-1">Balance</div>
+                                    <ng-container *ngIf="client.balance && client.balance > 0; else noBono">
+                                        <div class="flex items-center text-lg font-bold text-green-600 dark:text-green-400">
+                                            <mat-icon [svgIcon]="'heroicons_solid:banknotes'" class="mr-1 text-green-600 dark:text-green-400"></mat-icon>
+                                            ${{ client.balance }}
+                                        </div>
+                                        <div class="text-xs text-green-600 mt-1">Bono</div>
+                                    </ng-container>
+                                    <ng-template #noBono>
+                                        <div class="text-xs text-gray-400 mt-1">Sin abono</div>
+                                    </ng-template>
                                 </div>
                             </a>
                         </ng-container>
