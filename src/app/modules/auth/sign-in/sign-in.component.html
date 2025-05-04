@@ -1,33 +1,25 @@
-<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0">
-    <div class="md:flex md:items-center md:justify-end w-full sm:w-auto md:h-full md:w-1/2 py-8 px-4 sm:p-12 md:p-16 sm:rounded-2xl md:rounded-none sm:shadow md:shadow-none sm:bg-card">
-        <div class="w-full max-w-80 sm:w-80 mx-auto sm:mx-0">
-            <!-- Logo -->
-            <div class="w-12">
-                <img src="assets/images/logo/logo.svg">
+<div class="flex flex-col md:flex-row min-h-screen w-full">
+    <!-- Left: Card, always visible, fills screen on mobile -->
+    <div class="flex flex-col justify-center items-center w-full md:w-1/2 px-4 md:px-8 py-8 md:py-12 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen">
+        <div class="w-full max-w-md rounded-2xl shadow-xl p-6 md:p-10 border border-gray-200 bg-white">
+            <!-- Logo & Name -->
+            <div class="flex flex-col items-center mb-8">
+                <img src="assets/images/logo/logo.svg" class="w-16 h-16 mb-2" alt="Logo">
+                <h1 class="text-3xl font-extrabold text-gray-800 tracking-tight font-serif">Rosa Violeta & Corset</h1>
             </div>
-
             <!-- Title -->
-            <div class="mt-8 text-4xl font-extrabold tracking-tight leading-tight">Sign in</div>
-            <div class="flex items-baseline mt-0.5 font-medium">
-                <div>Don't have an account?</div>
-                <a
-                    class="ml-1 text-primary-500 hover:underline"
-                    [routerLink]="['/sign-up']">Sign up
-                </a>
-            </div>
-
-            <!-- Alert -->
+            <h2 class="text-2xl font-bold text-gray-700 mb-2 text-center">Iniciar sesión</h2>
+            <p class="text-center text-gray-400 mb-6">Bienvenida a la comunidad de moda más exclusiva</p>
+            <!-- Alerts -->
             <fuse-alert
-                class="mt-8"
+                class="mb-4"
                 [appearance]="'outline'"
                 [showIcon]="false"
                 [type]="'info'">
-                You are browsing <strong>Fuse Demo</strong>. Click on the "Sign in" button to access the Demo and Documentation.
+                Estás en la <strong>Plataforma Administrativa de Rosa Violeta & Corset</strong>. Inicia sesión.
             </fuse-alert>
-
-            <!-- Alert -->
             <fuse-alert
-                class="mt-8"
+                class="mb-4"
                 *ngIf="showAlert"
                 [appearance]="'outline'"
                 [showIcon]="false"
@@ -35,171 +27,91 @@
                 [@shake]="alert.type === 'error'">
                 {{alert.message}}
             </fuse-alert>
-
-            <!-- Sign in form -->
-            <form
-                class="mt-8"
-                [formGroup]="signInForm"
-                #signInNgForm="ngForm">
-
-                <!-- Email field -->
+            <!-- Form -->
+            <form [formGroup]="signInForm" #signInNgForm="ngForm" class="space-y-6">
+                <!-- Email -->
                 <mat-form-field class="w-full">
-                    <mat-label>Email address</mat-label>
-                    <input
-                        id="username"
-                        matInput
-                        [formControlName]="'username'">
+                    <mat-label>Usuario</mat-label>
+                    <input id="username" matInput [formControlName]="'username'">
                     <mat-error *ngIf="signInForm.get('username').hasError('required')">
-                        Email address is required
-                    </mat-error>
-                    <mat-error *ngIf="signInForm.get('username').hasError('email')">
-                        Please enter a valid email address
+                        El usuario es obligatorio
                     </mat-error>
                 </mat-form-field>
-
-                <!-- Password field -->
+                <!-- Password -->
                 <mat-form-field class="w-full">
-                    <mat-label>Password</mat-label>
-                    <input
-                        id="password"
-                        matInput
-                        type="password"
-                        [formControlName]="'password'"
-                        #passwordField>
+                    <mat-label>Contraseña</mat-label>
+                    <input id="password" matInput type="password" [formControlName]="'password'" #passwordField>
                     <button
                         mat-icon-button
                         type="button"
                         (click)="passwordField.type === 'password' ? passwordField.type = 'text' : passwordField.type = 'password'"
                         matSuffix>
-                        <mat-icon
-                            class="icon-size-5"
-                            *ngIf="passwordField.type === 'password'"
-                            [svgIcon]="'heroicons_solid:eye'"></mat-icon>
-                        <mat-icon
-                            class="icon-size-5"
-                            *ngIf="passwordField.type === 'text'"
-                            [svgIcon]="'heroicons_solid:eye-slash'"></mat-icon>
+                        <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'password'" [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+                        <mat-icon class="icon-size-5" *ngIf="passwordField.type === 'text'" [svgIcon]="'heroicons_solid:eye-slash'"></mat-icon>
                     </button>
                     <mat-error>
-                        Password is required
+                        La contraseña es obligatoria
                     </mat-error>
                 </mat-form-field>
-
-                <!-- Actions -->
-<!--                <div class="inline-flex items-center justify-between w-full mt-1.5">-->
-<!--                    <mat-checkbox-->
-<!--                        class="-ml-2"-->
-<!--                        [color]="'primary'"-->
-<!--                        [formControlName]="'rememberMe'">-->
-<!--                        Remember me-->
-<!--                    </mat-checkbox>-->
-<!--                    <a-->
-<!--                        class="text-md font-medium text-primary-500 hover:underline"-->
-<!--                        [routerLink]="['/forgot-password']">Forgot password?-->
-<!--                    </a>-->
-<!--                </div>-->
-
-                <!-- Submit button -->
+                <!-- Submit -->
                 <button
-                    class="fuse-mat-button-large w-full mt-6"
+                    class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 text-white font-bold text-lg shadow-lg hover:from-indigo-700 hover:to-fuchsia-700 transition-all"
                     mat-flat-button
-                    [color]="'primary'"
                     [disabled]="signInForm.disabled"
                     (click)="signIn()">
-                    <span *ngIf="!signInForm.disabled">
-                        Sign in
-                    </span>
-                    <mat-progress-spinner
-                        *ngIf="signInForm.disabled"
-                        [diameter]="24"
-                        [mode]="'indeterminate'"></mat-progress-spinner>
+                    <span *ngIf="!signInForm.disabled">Iniciar sesión</span>
+                    <mat-progress-spinner *ngIf="signInForm.disabled" [diameter]="24" [mode]="'indeterminate'"></mat-progress-spinner>
                 </button>
-
-                <!-- Separator -->
-                <div class="flex items-center mt-8">
-                    <div class="flex-auto mt-px border-t"></div>
-                    <div class="mx-2 text-secondary">Or continue with</div>
-                    <div class="flex-auto mt-px border-t"></div>
-                </div>
-
-                <!-- Single sign-on buttons -->
-                <div class="flex items-center mt-8 space-x-4">
-                    <button
-                        class="flex-auto"
-                        type="button"
-                        mat-stroked-button>
-                        <mat-icon
-                            class="icon-size-5"
-                            [svgIcon]="'feather:facebook'"></mat-icon>
-                    </button>
-                    <button
-                        class="flex-auto"
-                        type="button"
-                        mat-stroked-button>
-                        <mat-icon
-                            class="icon-size-5"
-                            [svgIcon]="'feather:twitter'"></mat-icon>
-                    </button>
-                    <button
-                        class="flex-auto"
-                        type="button"
-                        mat-stroked-button>
-                        <mat-icon
-                            class="icon-size-5"
-                            [svgIcon]="'feather:github'"></mat-icon>
-                    </button>
-                </div>
             </form>
         </div>
     </div>
-    <div class="relative hidden md:flex flex-auto items-center justify-center w-1/2 h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-l">
-        <!-- Background - @formatter:off -->
-        <!-- Rings -->
-        <svg class="absolute inset-0 pointer-events-none"
-             viewBox="0 0 960 540" width="100%" height="100%" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
-            <g class="text-gray-700 opacity-25" fill="none" stroke="currentColor" stroke-width="100">
-                <circle r="234" cx="196" cy="23"></circle>
-                <circle r="234" cx="790" cy="491"></circle>
-            </g>
-        </svg>
-        <!-- Dots -->
-        <svg class="absolute -top-16 -right-16 text-gray-700"
-             viewBox="0 0 220 192" width="220" height="192" fill="none">
-            <defs>
-                <pattern id="837c3e70-6c3a-44e6-8854-cc48c737b659" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <rect x="0" y="0" width="4" height="4" fill="currentColor"></rect>
-                </pattern>
-            </defs>
-            <rect width="220" height="192" fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"></rect>
-        </svg>
-        <!-- @formatter:on -->
-        <!-- Content -->
-        <div class="z-10 relative w-full max-w-2xl">
-            <div class="text-7xl font-bold leading-none text-gray-100">
-                <div>Welcome to</div>
-                <div>our community</div>
-            </div>
-            <div class="mt-6 text-lg tracking-tight leading-6 text-gray-400">
-                Fuse helps developers to build organized and well coded dashboards full of beautiful and rich modules.
-                Join us and start building your application today.
-            </div>
-            <div class="flex items-center mt-8">
-                <div class="flex flex-0 items-center -space-x-1.5">
-                    <img
-                        class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
-                        src="assets/images/avatars/female-18.jpg">
-                    <img
-                        class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
-                        src="assets/images/avatars/female-11.jpg">
-                    <img
-                        class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
-                        src="assets/images/avatars/male-09.jpg">
-                    <img
-                        class="flex-0 w-10 h-10 rounded-full ring-4 ring-offset-1 ring-gray-800 ring-offset-gray-800 object-cover"
-                        src="assets/images/avatars/male-16.jpg">
-                </div>
-                <div class="ml-4 font-medium tracking-tight text-gray-400">More than 17k people joined us, it's your turn</div>
-            </div>
+    <!-- Right: Fashion background, only on md+ screens, with enhanced design -->
+    <div class="relative hidden md:flex flex-auto items-center justify-center w-1/2 min-h-screen p-0 overflow-hidden">
+        <!-- Background layers -->
+        <div class="absolute inset-0 z-0">
+            <!-- Main gradient -->
+            <div class="w-full h-full bg-gradient-to-br from-gray-900 via-indigo-900 to-fuchsia-900"></div>
+            <!-- Diagonal overlay gradient -->
+            <div class="absolute inset-0 w-full h-full bg-gradient-to-tr from-fuchsia-500/20 via-transparent to-indigo-400/10"></div>
+            <!-- Decorative circles/bubbles with animation -->
+            <div class="absolute top-10 left-10 w-44 h-44 bg-fuchsia-400 opacity-30 rounded-full filter blur-2xl animate-pulse"></div>
+            <div class="absolute bottom-24 right-24 w-36 h-36 bg-indigo-400 opacity-20 rounded-full filter blur-2xl animate-pulse"></div>
+            <div class="absolute top-1/2 left-1/3 w-28 h-28 bg-white opacity-10 rounded-full filter blur-2xl"></div>
+            <div class="absolute top-1/4 right-1/4 w-20 h-20 bg-pink-300 opacity-20 rounded-full filter blur-2xl"></div>
+            <!-- Animated sparkles -->
+            <svg class="absolute top-16 left-1/2 w-8 h-8 opacity-40 animate-bounce" fill="none" viewBox="0 0 24 24">
+                <path d="M12 2 L13 8 L19 9 L14 13 L15 19 L12 16 L9 19 L10 13 L5 9 L11 8 Z" fill="white"/>
+            </svg>
+            <svg class="absolute bottom-16 right-1/3 w-6 h-6 opacity-30 animate-ping" fill="none" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="6" fill="white"/>
+            </svg>
+            <!-- Fashion SVG icons (hanger, shoe, dress) -->
+            <svg class="absolute top-24 right-24 w-24 h-24 opacity-30 filter blur-sm" fill="none" stroke="white" stroke-width="2" viewBox="0 0 48 48">
+                <!-- Hanger -->
+                <path d="M24 8 Q24 16 32 20 Q40 24 24 40 Q8 24 16 20 Q24 16 24 8" />
+            </svg>
+            <svg class="absolute bottom-10 left-32 w-20 h-20 opacity-20 filter blur-sm" fill="none" stroke="white" stroke-width="2" viewBox="0 0 48 48">
+                <!-- High heel shoe -->
+                <path d="M8 36 Q20 20 40 36 L36 40 Q32 44 28 40 Q24 36 8 36 Z" />
+            </svg>
+            <svg class="absolute top-1/3 right-1/3 w-16 h-16 opacity-20 filter blur-sm" fill="none" stroke="white" stroke-width="2" viewBox="0 0 48 48">
+                <!-- Dress -->
+                <ellipse cx="24" cy="36" rx="10" ry="6" />
+                <path d="M24 12 L18 36 L30 36 Z" />
+                <circle cx="24" cy="8" r="4" />
+            </svg>
+        </div>
+        <!-- Foreground content -->
+        <div class="relative z-10 flex flex-col items-center justify-center w-full h-full px-12">
+            <h2 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow-lg text-center font-serif mb-6">
+                Rosa Violeta & Corset
+            </h2>
+            <p class="text-xl md:text-2xl text-gray-200 text-center font-light mb-8 max-w-xl">
+                La plataforma donde la moda cobra vida. Descubre, crea y conecta con la comunidad más chic y creativa.
+            </p>
+            <span class="inline-block bg-white/10 text-white px-6 py-3 rounded-full font-semibold text-lg shadow-lg backdrop-blur-md">
+            Tendencias, inspiración y estilo profesional
+        </span>
         </div>
     </div>
 </div>
