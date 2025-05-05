@@ -52,32 +52,32 @@ export class SettingsComponent implements OnInit, OnDestroy
             {
                 id         : 'account',
                 icon       : 'heroicons_outline:user-circle',
-                title      : 'Account',
-                description: 'Manage your public profile and private information',
+                title      : 'Cuenta',
+                description: 'Manejo de tu cuenta y información personal',
             },
             {
                 id         : 'security',
                 icon       : 'heroicons_outline:lock-closed',
-                title      : 'Security',
-                description: 'Manage your password and 2-step verification preferences',
+                title      : 'Seguridad',
+                description: 'Manejo de la seguridad de tu cuenta (cambiar contraseña)',
             },
-            {
-                id         : 'plan-billing',
-                icon       : 'heroicons_outline:credit-card',
-                title      : 'Plan & Billing',
-                description: 'Manage your subscription plan, payment method and billing information',
-            },
-            {
-                id         : 'notifications',
-                icon       : 'heroicons_outline:bell',
-                title      : 'Notifications',
-                description: 'Manage when you\'ll be notified on which channels',
-            },
+            // {
+            //     id         : 'plan-billing',
+            //     icon       : 'heroicons_outline:credit-card',
+            //     title      : 'Plan & Billing',
+            //     description: 'Manage your subscription plan, payment method and billing information',
+            // },
+            // {
+            //     id         : 'notifications',
+            //     icon       : 'heroicons_outline:bell',
+            //     title      : 'Notifications',
+            //     description: 'Manage when you\'ll be notified on which channels',
+            // },
             {
                 id         : 'team',
                 icon       : 'heroicons_outline:user-group',
-                title      : 'Team',
-                description: 'Manage your existing team and change roles/permissions',
+                title      : 'Equipo',
+                description: 'Manejo de los miembros de tu equipo',
             },
         ];
 

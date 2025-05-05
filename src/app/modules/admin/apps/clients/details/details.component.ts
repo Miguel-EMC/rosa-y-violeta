@@ -12,7 +12,7 @@ import {MatDrawerToggleResult} from "@angular/material/sidenav";
 import {ClientsListComponent} from "../list/list.component";
 import {Subject} from "rxjs";
 import {OverlayRef} from "@angular/cdk/overlay";
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ClientsService} from "../../../../../services/clients.service";
 import {MatIconModule} from "@angular/material/icon";
 import {NgClass, NgIf} from "@angular/common";
@@ -82,6 +82,8 @@ export class ClientsDetailsComponent implements OnInit {
         private _fuseConfirmationService: FuseConfirmationService,
         private _toastrService: ToastrService,
         private fb: FormBuilder,
+        private _router: Router,
+
     ) {
     }
 
@@ -260,8 +262,10 @@ export class ClientsDetailsComponent implements OnInit {
                 this._clientsService.deleteClient(this.client.id).subscribe({
                     next: () => {
                         this._toastrService.success('Cliente eliminado con éxito', 'Éxito');
-                        this.closeDrawer().then(() => {
-                            this._clientsListComponent.loadClients()
+                        this._clientsListComponent.selectedClient = null;
+                        this._clientsListComponent.loadClients();
+                        this._router.navigate(['../'], { relativeTo: this._activatedRoute }).then(() => {
+                            this.closeDrawer();
                         });
                     },
                     error: () => {
@@ -271,7 +275,6 @@ export class ClientsDetailsComponent implements OnInit {
             }
         });
     }
-
     /**
      * Track by function for ngFor loops
      *
