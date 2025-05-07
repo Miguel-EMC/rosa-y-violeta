@@ -49,7 +49,7 @@ export class ProductsService {
     }
 
     sendClientsForProduct(productId: number, payload: any): Observable<any> {
-        return this.http.put(
+        return this.http.post(
             `${this.baseUrl}products/assign_product/by_product/${productId}/`,
             payload
         );
