@@ -37,7 +37,7 @@ export const shortcuts = [
         label      : 'Cerrar sesión',
         description: 'Cerrar sesión de la aplicación',
         icon       : 'heroicons_outline:arrow-right-on-rectangle',
-        link       : '/sign-out',
-        useRouter  : true,
+        link       : 'logout',  // Change this to a function name instead of a route
+        useRouter  : false,     // Set to false since we'll handle this with a function
     },
 ];

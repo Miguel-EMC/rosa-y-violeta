@@ -13,6 +13,7 @@ import { RouterLink } from '@angular/router';
 import { ShortcutsService } from 'app/layout/common/shortcuts/shortcuts.service';
 import { Shortcut } from 'app/layout/common/shortcuts/shortcuts.types';
 import { Subject, takeUntil } from 'rxjs';
+import { AuthService } from 'app/core/auth/auth.service';
 
 @Component({
     selector       : 'shortcuts',
@@ -43,6 +44,7 @@ export class ShortcutsComponent implements OnInit, OnDestroy
         private _shortcutsService: ShortcutsService,
         private _overlay: Overlay,
         private _viewContainerRef: ViewContainerRef,
+        private _authService: AuthService,
     )
     {
     }
@@ -77,6 +79,27 @@ export class ShortcutsComponent implements OnInit, OnDestroy
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+    }
+
+    handleLogout(event: Event): void {
+        event.preventDefault();
+        this.closePanel();
+        this._authService.logout().subscribe({
+            next: () => {
+                // Clear localStorage
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refresh');
+                window.location.href = '/sign-in';
+            },
+            error: (error) => {
+                console.error('Error during logout:', error);
+                // Still try to clear localStorage as a fallback
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refresh');
+                // Force navigation to sign-in
+                window.location.href = '/sign-in';
+            }
+        });
     }
 
     /**
