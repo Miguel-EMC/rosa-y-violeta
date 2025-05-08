@@ -185,14 +185,14 @@ export const appRoutes: Route[] = [
             ]},
 
             // Documentation
-            {path: 'docs', children: [
-
-                // Changelog
-                {path: 'changelog', loadChildren: () => import('app/modules/admin/docs/changelog/changelog.routes')},
-
-                // Guides
-                {path: 'guides', loadChildren: () => import('app/modules/admin/docs/guides/guides.routes')}
-            ]},
+            // {path: 'docs', children: [
+            //
+            //     // Changelog
+            //     {path: 'changelog', loadChildren: () => import('app/modules/admin/docs/changelog/changelog.routes')},
+            //
+            //     // Guides
+            //     {path: 'guides', loadChildren: () => import('app/modules/admin/docs/guides/guides.routes')}
+            // ]},
 
             // 404 & Catch all
             {path: '404-not-found', pathMatch: 'full', loadChildren: () => import('app/modules/admin/pages/error/error-404/error-404.routes')},

@@ -1,108 +1,58 @@
 <div class="flex flex-col flex-auto min-w-0">
 
     <!-- Header -->
-    <div class="bg-card">
-        <div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
-            <div class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-8 sm:my-12">
-                <!-- Avatar and name -->
+    <!-- Header -->
+    <div class="bg-pink-50">
+        <div class="flex flex-col w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 py-6 sm:py-8 md:py-10">
+                <!-- Avatar y nombre -->
                 <div class="flex flex-auto items-center min-w-0">
-                    <div class="flex-0 w-16 h-16 rounded-full overflow-hidden">
-                        <img
-                            class="w-full h-full object-cover"
-                            src="assets/images/avatars/brian-hughes.jpg">
+                    <div
+                        class="relative flex-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden shadow-lg border-2 border-pink-500 flex items-center justify-center bg-pink-100">
+                        <mat-icon
+                            class="icon-size-10 sm:icon-size-12 text-pink-700"
+                            [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+                        <div
+                            class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white"></div>
                     </div>
-                    <div class="flex flex-col min-w-0 ml-4">
-                        <ng-container *transloco="let t">
-                            <div class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate">{{t('welcome-back')}}, Brian!</div>
-                        </ng-container>
-                        <div class="flex items-center">
+                    <div class="flex flex-col min-w-0 ml-3 sm:ml-4">
+                        <div
+                            class="text-xl sm:text-2xl md:text-4xl font-semibold tracking-tight leading-tight md:leading-snug truncate">
+                            ¡Bienvenido de nuevo, Admin!
+                        </div>
+                        <div class="flex items-center mt-1.5 bg-pink-100 rounded-full px-3 py-1 max-w-max">
                             <mat-icon
-                                class="icon-size-5"
+                                class="icon-size-5 text-pink-600"
                                 [svgIcon]="'heroicons_solid:bell'"></mat-icon>
-                            <div class="ml-1.5 leading-6 truncate text-secondary">You have {{apiData?.metrics?.pending_orders || 0}} pending orders</div>
+                            <div class="ml-1.5 leading-6 truncate text-pink-800">
+                                Aun existen <span class="font-bold">{{ apiData?.metrics?.pending_orders || 0 }}</span>
+                                <span class="hidden xs:inline">pedidos pendientes</span>
+                                <span class="inline xs:hidden"> pedidos pendientes</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <!-- Actions -->
-                <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
-                    <button
-                        class="bg-accent"
-                        mat-flat-button
-                        [color]="'accent'">
-                        <mat-icon
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
-                        <span class="ml-2">Messages</span>
-                    </button>
+                <!-- Acciones -->
+                <div
+                    class="flex flex-col sm:flex-row items-start sm:items-center mt-5 sm:mt-0 sm:ml-2 space-y-2 sm:space-y-0 sm:space-x-3">
                     <button
                         mat-flat-button
-                        [color]="'primary'">
+                        [color]="'accent'"
+                        [disabled]="isVerifyingData"
+                        (click)="verifyApiData()"
+                        class="min-w-[140px] shadow-sm bg-pink-500 hover:bg-pink-600">
                         <mat-icon
                             class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:cog-8-tooth'"></mat-icon>
-                        <span class="ml-2">Settings</span>
+                            [svgIcon]="isVerifyingData ? 'heroicons_solid:arrow-path' : 'heroicons_solid:arrow-path'"
+                            [class.animate-spin]="isVerifyingData"></mat-icon>
+                        <span class="ml-2">{{ isVerifyingData ? 'Actualizando...' : 'Actualizar Datos' }}</span>
                     </button>
-                </div>
-            </div>
-            <!-- Project selector -->
-            <div
-                class="relative flex self-start pt-2 pb-1 pl-5 pr-4 cursor-pointer overflow-hidden rounded-t-xl border border-b-0 bg-default"
-                matRipple
-                [matMenuTriggerFor]="projectsMenu">
-                <div class="flex items-center">
-                    <div class="overflow-hidden">
-                        <div class="font-medium leading-6 truncate">{{selectedProject}}</div>
-                    </div>
-                    <div class="flex items-center justify-center pl-2">
-                        <mat-icon
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_mini:chevron-down'"></mat-icon>
+                    <div class="text-sm text-pink-700 flex items-center" *ngIf="apiData?.refresh_time">
+                        <mat-icon class="icon-size-4 mr-1 text-pink-500" [svgIcon]="'heroicons_solid:clock'"></mat-icon>
+                        Actualizado: {{ apiData?.refresh_time | date:'medium':'':'es' }}
                     </div>
                 </div>
-                <mat-menu
-                    #projectsMenu="matMenu"
-                    [xPosition]="'before'">
-                    <button
-                        mat-menu-item
-                        (click)="selectedProject='ACME Corp. Backend App'">ACME Corp. Backend App
-                    </button>
-                    <button
-                        mat-menu-item
-                        (click)="selectedProject='ACME Corp. Frontend App'">ACME Corp. Frontend App
-                    </button>
-                    <button
-                        mat-menu-item
-                        (click)="selectedProject='Creapond'">Creapond
-                    </button>
-                    <button
-                        mat-menu-item
-                        (click)="selectedProject='Withinpixels'">Withinpixels
-                    </button>
-                </mat-menu>
             </div>
-        </div>
-    </div>
-
-    <!-- API Data Verification Panel -->
-    <div *ngIf="apiData || isVerifyingData" class="bg-card shadow rounded-2xl overflow-hidden m-6 p-6">
-        <div class="flex items-center justify-between mb-4">
-            <div class="text-2xl font-semibold">API Data Verification</div>
-            <button
-                mat-raised-button
-                color="primary"
-                (click)="verifyApiData()"
-                [disabled]="isVerifyingData">
-                <mat-icon class="mr-2" [svgIcon]="'heroicons_mini:arrow-path'"></mat-icon>
-                Refresh Data
-            </button>
-        </div>
-
-        <div *ngIf="isVerifyingData" class="flex justify-center py-8">
-            <div class="text-xl text-secondary">Loading API data...</div>
-        </div>
-
-        <div *ngIf="apiData && !isVerifyingData" class="overflow-auto max-h-96">
-            <pre class="text-sm p-4 bg-gray-100 rounded">{{ apiData | json }}</pre>
         </div>
     </div>
 
@@ -115,198 +65,354 @@
                 mat-stretch-tabs="false"
                 [animationDuration]="'0'">
 
-                <!-- Home -->
-                <mat-tab label="Home">
+                <!-- Dashboard -->
+                <mat-tab label="Panel Principal">
                     <ng-template matTabContent>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full min-w-0">
-                            <!-- Products -->
-                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="flex items-start justify-between">
-                                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Products</div>
-                                    <div class="ml-2 -mt-2 -mr-3">
-                                        <button mat-icon-button [matMenuTriggerFor]="productsMenu">
-                                            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-                                        </button>
-                                        <mat-menu #productsMenu="matMenu">
-                                            <button mat-menu-item>All Products</button>
-                                            <button mat-menu-item>Active Products</button>
-                                            <button mat-menu-item>Low Stock</button>
-                                        </mat-menu>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-center mt-2">
-                                    <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-blue-500">
-                                        {{apiData?.metrics?.total_products || 0}}
-                                    </div>
-                                    <div class="text-lg font-medium text-blue-600 dark:text-blue-500">Total Products</div>
-                                    <div class="flex items-baseline justify-center w-full mt-5 text-secondary">
-                                        <div class="text-md font-medium truncate">Low Stock:</div>
-                                        <div class="ml-1.5 text-lg font-semibold">{{apiData?.metrics?.low_stock_products || 0}}</div>
-                                    </div>
+                        <!-- KPI Summary Cards -->
+                        <div class="p-4 sm:p-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">Resumen del
+                                    Negocio</h2>
+                                <div
+                                    class="text-xs sm:text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center">
+                                    <mat-icon class="icon-size-4 mr-1"
+                                              [svgIcon]="'heroicons_solid:calendar'"></mat-icon>
+                                    {{ apiData?.refresh_time | date:'longDate':'':'es' }}
                                 </div>
                             </div>
 
-                            <!-- Orders -->
-                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="flex items-start justify-between">
-                                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Orders</div>
-                                    <div class="ml-2 -mt-2 -mr-3">
-                                        <button mat-icon-button [matMenuTriggerFor]="ordersMenu">
-                                            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-                                        </button>
-                                        <mat-menu #ordersMenu="matMenu">
-                                            <button mat-menu-item>All Orders</button>
-                                            <button mat-menu-item>Pending Orders</button>
-                                            <button mat-menu-item>Shipped Orders</button>
-                                        </mat-menu>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-center mt-2">
-                                    <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-red-500">
-                                        {{apiData?.metrics?.total_orders || 0}}
-                                    </div>
-                                    <div class="text-lg font-medium text-red-600 dark:text-red-500">Total Orders</div>
-                                    <div class="flex items-baseline justify-center w-full mt-5 text-secondary">
-                                        <div class="text-md font-medium truncate">Pending:</div>
-                                        <div class="ml-1.5 text-lg font-semibold">{{apiData?.metrics?.pending_orders || 0}}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Stock Issues -->
-                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="flex items-start justify-between">
-                                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Stock Issues</div>
-                                    <div class="ml-2 -mt-2 -mr-3">
-                                        <button mat-icon-button [matMenuTriggerFor]="stockMenu">
-                                            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-                                        </button>
-                                        <mat-menu #stockMenu="matMenu">
-                                            <button mat-menu-item>Out of Stock</button>
-                                            <button mat-menu-item>Low Stock</button>
-                                        </mat-menu>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-center mt-2">
-                                    <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-amber-500">
-                                        {{apiData?.metrics?.out_of_stock_products || 0}}
-                                    </div>
-                                    <div class="text-lg font-medium text-amber-600 dark:text-amber-500">Out of Stock</div>
-                                    <div class="flex items-baseline justify-center w-full mt-5 text-secondary">
-                                        <div class="text-md font-medium truncate">Low Stock:</div>
-                                        <div class="ml-1.5 text-lg font-semibold">{{apiData?.metrics?.low_stock_products || 0}}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Clients -->
-                            <div class="flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="flex items-start justify-between">
-                                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Clients</div>
-                                    <div class="ml-2 -mt-2 -mr-3">
-                                        <button mat-icon-button [matMenuTriggerFor]="clientsMenu">
-                                            <mat-icon class="icon-size-5" [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-                                        </button>
-                                        <mat-menu #clientsMenu="matMenu">
-                                            <button mat-menu-item>All Clients</button>
-                                            <button mat-menu-item>Active Clients</button>
-                                        </mat-menu>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col items-center mt-2">
-                                    <div class="text-7xl sm:text-8xl font-bold tracking-tight leading-none text-green-500">
-                                        {{apiData?.metrics?.total_clients || 0}}
-                                    </div>
-                                    <div class="text-lg font-medium text-green-600 dark:text-green-500">Total Clients</div>
-                                    <div class="flex items-baseline justify-center w-full mt-5 text-secondary">
-                                        <div class="text-md font-medium truncate">Active:</div>
-                                        <div class="ml-1.5 text-lg font-semibold">{{apiData?.metrics?.active_clients || 0}}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Top Products -->
-                            <div class="sm:col-span-2 md:col-span-4 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="flex flex-col sm:flex-row items-start justify-between">
-                                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Top Products</div>
-                                    <div class="mt-3 sm:mt-0 sm:ml-2">
-                                        <button mat-flat-button color="primary">View All Products</button>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col mt-2">
-                                    <div class="overflow-x-auto">
-                                        <table class="min-w-full divide-y divide-gray-300">
-                                            <thead>
-                                            <tr>
-                                                <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                                                <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                                <th class="py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                                                <th class="py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Units Sold</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                            <tr *ngFor="let product of apiData?.top_products; trackBy: trackByFn">
-                                                <td class="py-4 text-sm font-medium text-gray-900">{{product.id}}</td>
-                                                <td class="py-4 text-sm text-gray-900">{{product.name}}</td>
-                                                <td class="py-4 text-sm text-gray-900 text-right">{{product.stock}}</td>
-                                                <td class="py-4 text-sm text-gray-900 text-right">{{product.units_sold}}</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Top Clients -->
-                            <div class="sm:col-span-2 md:col-span-4 lg:col-span-2 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="flex flex-col sm:flex-row items-start justify-between">
-                                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Top Clients</div>
-                                    <div class="mt-3 sm:mt-0 sm:ml-2">
-                                        <button mat-flat-button color="primary">View All Clients</button>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col mt-2">
-                                    <div class="overflow-x-auto">
-                                        <table class="min-w-full divide-y divide-gray-300">
-                                            <thead>
-                                            <tr>
-                                                <th class="py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                                                <th class="py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
-                                                <th class="py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Spend</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="bg-white divide-y divide-gray-200">
-                                            <tr *ngFor="let client of apiData?.top_clients; trackBy: trackByFn">
-                                                <td class="py-4 text-sm font-medium text-gray-900">{{client.full_name}}</td>
-                                                <td class="py-4 text-sm text-gray-900 text-right">{{client.orders_count}}</td>
-                                                <td class="py-4 text-sm text-gray-900 text-right">${{client.total_spend | number:'1.2-2'}}</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Recent Active Clients -->
-                            <div class="sm:col-span-2 md:col-span-4 lg:col-span-2 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="flex flex-col sm:flex-row items-start justify-between">
-                                    <div class="text-lg font-medium tracking-tight leading-6 truncate">Recent Active Clients</div>
-                                </div>
-                                <div class="flex flex-col mt-2 divide-y">
-                                    <ng-container *ngFor="let client of apiData?.recent_active_clients; trackBy: trackByFn">
-                                        <div class="flex flex-row items-center justify-between py-4 px-0.5">
-                                            <div class="flex flex-col">
-                                                <div class="font-medium">{{client.first_name}} {{client.last_name}}</div>
-                                                <div class="flex flex-col sm:flex-row sm:items-center -ml-0.5 mt-2 sm:mt-1 space-y-1 sm:space-y-0 sm:space-x-3">
-                                                    <div class="flex items-center">
-                                                        <mat-icon class="icon-size-5 text-hint" [svgIcon]="'heroicons_solid:identification'"></mat-icon>
-                                                        <div class="ml-1.5 text-md text-secondary">ID: {{client.id}}</div>
-                                                    </div>
-                                                </div>
+                            <!-- Cards Grid with better mobile layout -->
+                            <div
+                                class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 w-full min-w-0">
+                                <!-- Productos Card -->
+                                <div
+                                    class="flex flex-col flex-auto p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-blue-500 transition-all duration-300">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="text-xs sm:text-sm text-blue-600 font-medium mb-1">PRODUCTOS
                                             </div>
-                                            <button mat-icon-button>
-                                                <mat-icon [svgIcon]="'heroicons_mini:chevron-right'"></mat-icon>
-                                            </button>
+                                            <div
+                                                class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                                Inventario Total
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-center rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-blue-100">
+                                            <mat-icon class="text-blue-600"
+                                                      [svgIcon]="'heroicons_solid:cube'"></mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-start mt-3 sm:mt-4">
+                                        <div
+                                            class="text-4xl sm:text-6xl font-bold tracking-tight leading-none text-blue-600">
+                                            {{ apiData?.metrics?.total_products || 0 }}
+                                        </div>
+                                        <div class="text-xs sm:text-sm font-medium text-blue-600 mt-1">Productos
+                                            Totales
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-between w-full mt-3 sm:mt-5 pt-2 sm:pt-3 border-t border-gray-200">
+                                            <div class="flex items-center">
+                                                <mat-icon class="icon-size-4 text-amber-500"
+                                                          [svgIcon]="'heroicons_solid:exclamation-triangle'"></mat-icon>
+                                                <div class="ml-1 text-xs sm:text-sm text-gray-600">Stock Bajo:</div>
+                                            </div>
+                                            <div class="text-base sm:text-lg font-semibold text-amber-600">
+                                                {{ apiData?.metrics?.low_stock_products || 0 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pedidos Card -->
+                                <div
+                                    class="flex flex-col flex-auto p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-red-500 transition-all duration-300">
+                                    <div class="flex items-start justify-between">
+                                        <div
+                                            class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                            Pedidos
+                                        </div>
+                                        <div class="flex items-center justify-center rounded-full w-10 h-10 bg-red-100">
+                                            <mat-icon class="text-red-600"
+                                                      [svgIcon]="'heroicons_solid:shopping-bag'"></mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-start mt-3 sm:mt-4">
+                                        <div
+                                            class="text-4xl sm:text-6xl font-bold tracking-tight leading-none text-red-600">
+                                            {{ apiData?.metrics?.total_orders || 0 }}
+                                        </div>
+                                        <div class="text-xs sm:text-sm font-medium text-red-600 mt-1">Pedidos Totales
+                                        </div>
+                                        <div
+                                            class="flex flex-col w-full mt-3 sm:mt-5 pt-2 sm:pt-3 border-t border-gray-200 space-y-2">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center">
+                                                    <div class="w-2 h-2 rounded-full bg-amber-500 mr-2"></div>
+                                                    <span class="text-xs sm:text-sm text-gray-600">Pendientes:</span>
+                                                </div>
+                                                <span
+                                                    class="text-xs sm:text-sm font-semibold">{{ apiData?.metrics?.pending_orders || 0 }}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center">
+                                                    <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                                                    <span class="text-xs sm:text-sm text-gray-600">Enviados:</span>
+                                                </div>
+                                                <span
+                                                    class="text-xs sm:text-sm font-semibold">{{ apiData?.metrics?.shipped_orders || 0 }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Problemas de Stock Card -->
+                                <div
+                                    class="flex flex-col flex-auto p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-amber-500 transition-all duration-300">
+                                    <div class="flex items-start justify-between">
+                                        <div
+                                            class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                            Stock
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-center rounded-full w-10 h-10 bg-amber-100">
+                                            <mat-icon class="text-amber-600"
+                                                      [svgIcon]="'heroicons_solid:exclamation-circle'"></mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-start mt-3 sm:mt-4">
+                                        <div
+                                            class="text-4xl sm:text-6xl font-bold tracking-tight leading-none text-amber-600">
+                                            {{ apiData?.metrics?.out_of_stock_products || 0 }}
+                                        </div>
+                                        <div class="text-xs sm:text-sm font-medium text-amber-600 mt-1">Sin Stock</div>
+                                        <div
+                                            class="flex items-center justify-between w-full mt-3 sm:mt-5 pt-2 sm:pt-3 border-t border-gray-200">
+                                            <div class="flex items-center">
+                                                <mat-icon class="icon-size-4 text-amber-500"
+                                                          [svgIcon]="'heroicons_solid:arrow-trending-down'"></mat-icon>
+                                                <div class="ml-1 text-xs sm:text-sm text-gray-600">Stock Bajo:</div>
+                                            </div>
+                                            <div
+                                                class="text-base sm:text-lg font-semibold text-amber-600">{{ apiData?.metrics?.low_stock_products || 0 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Clientes Card -->
+                                <div
+                                    class="flex flex-col flex-auto p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-green-500 transition-all duration-300">
+                                    <div class="flex items-start justify-between">
+                                        <div
+                                            class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                            Clientes
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-center rounded-full w-10 h-10 bg-green-100">
+                                            <mat-icon class="text-green-600"
+                                                      [svgIcon]="'heroicons_solid:user-group'"></mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-start mt-3 sm:mt-4">
+                                        <div
+                                            class="text-4xl sm:text-6xl font-bold tracking-tight leading-none text-green-600">
+                                            {{ apiData?.metrics?.total_clients || 0 }}
+                                        </div>
+                                        <div class="text-xs sm:text-sm font-medium text-green-600 mt-1">Clientes
+                                            Totales
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-between w-full mt-3 sm:mt-5 pt-2 sm:pt-3 border-t border-gray-200">
+                                            <div class="flex items-center">
+                                                <mat-icon class="icon-size-4 text-green-500"
+                                                          [svgIcon]="'heroicons_solid:check-badge'"></mat-icon>
+                                                <div class="ml-1 text-xs sm:text-sm text-gray-600">Activos:</div>
+                                            </div>
+                                            <div
+                                                class="text-base sm:text-lg font-semibold text-green-600">{{ apiData?.metrics?.active_clients || 0 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Top Products and Clients -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6 p-4 sm:p-6 pt-1">
+                            <!-- Top Products - Mobile Optimized -->
+                            <div
+                                class="flex flex-col bg-white rounded-xl shadow-md overflow-hidden transform transition-all hover:shadow-lg">
+                                <div
+                                    class="px-4 sm:px-6 py-3 sm:py-4 bg-blue-50 border-b border-blue-100 flex justify-between items-center">
+                                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">Productos Más
+                                        Vendidos</h3>
+<!--                                    <button mat-stroked-button color="primary" class="min-w-[80px] text-xs sm:text-sm">-->
+<!--                                        Ver Todos-->
+<!--                                    </button>-->
+                                </div>
+
+                                <!-- Card view for mobile, table for larger screens -->
+                                <div class="hidden sm:block px-4 sm:px-6 py-2 sm:py-4">
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    ID
+                                                </th>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Nombre
+                                                </th>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Stock
+                                                </th>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Vendidas
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                            <tr *ngFor="let product of apiData?.top_products; trackBy: trackByFn"
+                                                class="hover:bg-gray-50">
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-900">
+                                                    #{{ product.id }}
+                                                </td>
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900">{{ product.name }}</td>
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 text-right">
+                                    <span
+                                        [ngClass]="{'text-green-600': product.stock > 50, 'text-amber-600': product.stock <= 50 && product.stock > 10, 'text-red-600': product.stock <= 10}">
+                                        {{ product.stock }}
+                                    </span>
+                                                </td>
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-semibold text-indigo-700 text-right">{{ product.units_sold }}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Card view for mobile -->
+                                <div class="sm:hidden px-4 py-2 space-y-2">
+                                    <div *ngFor="let product of apiData?.top_products; trackBy: trackByFn"
+                                         class="bg-gray-50 hover:bg-gray-100 rounded-lg p-3 shadow-sm">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-xs font-medium text-gray-500">#{{ product.id }}</span>
+                                            <span class="text-xs font-semibold text-indigo-700">{{ product.units_sold }}
+                                                vendidas</span>
+                                        </div>
+                                        <div class="font-medium text-sm mb-2 truncate">{{ product.name }}</div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-xs text-gray-500">Stock:</span>
+                                            <span class="text-xs font-medium"
+                                                  [ngClass]="{'text-green-600': product.stock > 50, 'text-amber-600': product.stock <= 50 && product.stock > 10, 'text-red-600': product.stock <= 10}">
+                                {{ product.stock }} unidades
+                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Top Clients - Mobile Optimized -->
+                            <div
+                                class="flex flex-col bg-white rounded-xl shadow-md overflow-hidden transform transition-all hover:shadow-lg">
+                                <div
+                                    class="px-4 sm:px-6 py-3 sm:py-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
+                                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">Clientes
+                                        Principales</h3>
+<!--                                    <button mat-stroked-button color="accent" class="min-w-[80px] text-xs sm:text-sm">-->
+<!--                                        Ver Todos-->
+<!--                                    </button>-->
+                                </div>
+
+                                <!-- Table for larger screens -->
+                                <div class="hidden sm:block px-4 sm:px-6 py-2 sm:py-4">
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-200">
+                                            <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Cliente
+                                                </th>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Pedidos
+                                                </th>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Gasto Total
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                            <tr *ngFor="let client of apiData?.top_clients; trackBy: trackByFn"
+                                                class="hover:bg-gray-50">
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-900">{{ client.full_name }}</td>
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-900 text-center">
+                                    <span
+                                        class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-indigo-100 bg-indigo-700 rounded-full">
+                                        {{ client.orders_count }}
+                                    </span>
+                                                </td>
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-semibold text-green-700 text-right">
+                                                    ${{ client.total_spend | number:'1.2-2' }}
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Card view for mobile -->
+                                <div class="sm:hidden px-4 py-2 space-y-2">
+                                    <div *ngFor="let client of apiData?.top_clients; trackBy: trackByFn"
+                                         class="bg-gray-50 hover:bg-gray-100 rounded-lg p-3 shadow-sm">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="text-sm font-medium truncate">{{ client.full_name }}</span>
+                                            <span
+                                                class="inline-flex items-center justify-center px-2 py-0.5 ml-2 text-xs font-bold leading-none text-indigo-100 bg-indigo-700 rounded-full">
+                                {{ client.orders_count }}
+                            </span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-xs text-gray-500">Gasto total:</span>
+                                            <span
+                                                class="text-xs font-semibold text-green-700">${{ client.total_spend | number:'1.2-2' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Active Clients - Mobile Optimized -->
+                            <div
+                                class="md:col-span-2 flex flex-col bg-white rounded-xl shadow-md overflow-hidden transform transition-all hover:shadow-lg">
+                                <div
+                                    class="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b flex justify-between items-center">
+                                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">Clientes Recientemente
+                                        Activos</h3>
+<!--                                    <button mat-icon-button class="sm:hidden">-->
+<!--                                        <mat-icon [svgIcon]="'heroicons_solid:chevron-down'"></mat-icon>-->
+<!--                                    </button>-->
+                                </div>
+                                <div class="p-4 sm:p-6 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                                    <ng-container
+                                        *ngFor="let client of apiData?.recent_active_clients; trackBy: trackByFn">
+                                        <div
+                                            class="flex flex-col bg-gray-50 hover:bg-blue-50 rounded-lg p-3 sm:p-4 border border-gray-200 hover:border-blue-300 transition-all duration-200 transform hover:translate-y-[-2px]">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold mr-2 sm:mr-3 flex-shrink-0">
+                                                    {{ client.first_name.charAt(0) }}{{ client.last_name.charAt(0) }}
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="font-medium text-xs sm:text-sm text-gray-900 truncate">
+                                                        {{ client.first_name }} {{ client.last_name }}
+                                                    </div>
+                                                    <div class="text-xs text-gray-500">Cliente #{{ client.id }}</div>
+                                                </div>
+<!--                                                <button mat-icon-button class="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">-->
+<!--                                                    <mat-icon [svgIcon]="'heroicons_solid:arrow-top-right-on-square'"-->
+<!--                                                              class="text-gray-500 icon-size-4"></mat-icon>-->
+<!--                                                </button>-->
+                                            </div>
                                         </div>
                                     </ng-container>
                                 </div>
@@ -315,209 +421,306 @@
                     </ng-template>
                 </mat-tab>
 
-                <!-- Budget -->
-                <mat-tab label="Budget">
+
+                <!-- Financial -->
+                <mat-tab label="Financiero">
                     <ng-template matTabContent>
-                        <div class="grid grid-cols-1 sm:grid-cols-6 gap-6 w-full min-w-0">
-                            <!-- Sales Trend Chart -->
-                            <div class="sm:col-span-3 lg:col-span-4 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="text-lg font-medium tracking-tight leading-6 truncate">Sales Trend</div>
-                                <div class="flex flex-col flex-auto">
-                                    <apx-chart
-                                        class="flex-auto w-full h-80"
-                                        [chart]="chartBudgetDistribution.chart"
-                                        [colors]="chartBudgetDistribution.colors"
-                                        [dataLabels]="chartBudgetDistribution.dataLabels"
-                                        [markers]="chartBudgetDistribution.markers"
-                                        [plotOptions]="chartBudgetDistribution.plotOptions"
-                                        [series]="chartBudgetDistribution.series"
-                                        [stroke]="chartBudgetDistribution.stroke"
-                                        [tooltip]="chartBudgetDistribution.tooltip"
-                                        [xaxis]="chartBudgetDistribution.xaxis"
-                                        [yaxis]="chartBudgetDistribution.yaxis"></apx-chart>
+                        <div class="p-4 sm:p-6">
+                            <!-- Título y fecha -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 leading-tight">Resumen
+                                    Financiero</h2>
+                                <div
+                                    class="text-xs sm:text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center">
+                                    <mat-icon class="icon-size-4 mr-1"
+                                              [svgIcon]="'heroicons_solid:calendar'"></mat-icon>
+                                    {{ apiData?.refresh_time | date:'longDate':'':'es' }}
                                 </div>
                             </div>
 
-                            <!-- Financial Metrics -->
-                            <div class="sm:col-span-3 lg:col-span-2 grid grid-cols-1 gap-y-6">
-                                <!-- Recent Week Sales -->
-                                <div class="sm:col-span-2 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                            <!-- Tarjetas Métricas Financieras Principales -->
+                            <div
+                                class="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 w-full min-w-0 mb-6">
+                                <!-- Ventas Totales -->
+                                <div
+                                    class="flex flex-col p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-indigo-500 transition-all duration-300">
                                     <div class="flex items-start justify-between">
-                                        <div class="text-lg font-medium tracking-tight leading-6 truncate">Recent Week Sales</div>
-                                        <div class="ml-2 -mt-2 -mr-3">
-                                            <button
-                                                mat-icon-button
-                                                [matMenuTriggerFor]="weeklyExpensesMenu">
-                                                <mat-icon
-                                                    class="icon-size-5"
-                                                    [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-                                            </button>
-                                            <mat-menu #weeklyExpensesMenu="matMenu">
-                                                <button mat-menu-item>Details</button>
-                                            </mat-menu>
+                                        <div>
+                                            <div class="text-xs sm:text-sm text-indigo-600 font-medium mb-1">VENTAS
+                                            </div>
+                                            <div
+                                                class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                                Ventas Totales
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-center rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100">
+                                            <mat-icon class="text-indigo-600"
+                                                      [svgIcon]="'heroicons_solid:currency-dollar'"></mat-icon>
                                         </div>
                                     </div>
-                                    <div class="flex items-center mt-1">
-                                        <div class="flex flex-col">
-                                            <div class="text-3xl font-semibold tracking-tight leading-tight">
-                                                ${{apiData?.metrics?.financial?.recent_week_sales | number:'1.2-2'}}
-                                            </div>
-                                            <div class="flex items-center">
-                                                <mat-icon
-                                                    class="mr-1 icon-size-5 text-green-500"
-                                                    [svgIcon]="'heroicons_solid:arrow-trending-down'"></mat-icon>
-                                                <div class="font-medium text-sm text-secondary leading-none whitespace-nowrap">
-                                                    <span class="text-green-500">Weekly</span>
-                                                    sales
-                                                </div>
-                                            </div>
+                                    <div class="flex flex-col mt-3 sm:mt-4">
+                                        <div
+                                            class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-none text-indigo-600">
+                                            ${{ apiData?.metrics?.financial?.total_sales | number:'1.2-2':'es' }}
                                         </div>
-                                        <div class="flex flex-col flex-auto ml-8">
-                                            <apx-chart
-                                                class="flex-auto w-full h-16"
-                                                [chart]="chartWeeklyExpenses.chart"
-                                                [colors]="chartWeeklyExpenses.colors"
-                                                [series]="chartWeeklyExpenses.series"
-                                                [stroke]="chartWeeklyExpenses.stroke"
-                                                [tooltip]="chartWeeklyExpenses.tooltip"
-                                                [xaxis]="chartWeeklyExpenses.xaxis"
-                                                [yaxis]="chartWeeklyExpenses.yaxis"></apx-chart>
+                                        <div class="text-xs sm:text-sm font-medium text-indigo-600 mt-1">Ingresos
+                                            acumulados
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Recent Month Sales -->
-                                <div class="sm:col-span-2 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <!-- Ventas del Mes -->
+                                <div
+                                    class="flex flex-col p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-purple-500 transition-all duration-300">
                                     <div class="flex items-start justify-between">
-                                        <div class="text-lg font-medium tracking-tight leading-6 truncate">Recent Month Sales</div>
-                                        <div class="ml-2 -mt-2 -mr-3">
-                                            <button
-                                                mat-icon-button
-                                                [matMenuTriggerFor]="monthlyExpensesMenu">
-                                                <mat-icon
-                                                    class="icon-size-5"
-                                                    [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-                                            </button>
-                                            <mat-menu #monthlyExpensesMenu="matMenu">
-                                                <button mat-menu-item>Details</button>
-                                            </mat-menu>
+                                        <div>
+                                            <div class="text-xs sm:text-sm text-purple-600 font-medium mb-1">ESTE MES
+                                            </div>
+                                            <div
+                                                class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                                Ventas Mensuales
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-center rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-purple-100">
+                                            <mat-icon class="text-purple-600"
+                                                      [svgIcon]="'heroicons_solid:calendar'"></mat-icon>
                                         </div>
                                     </div>
-                                    <div class="flex items-center mt-1">
-                                        <div class="flex flex-col">
-                                            <div class="text-3xl font-semibold tracking-tight leading-tight">
-                                                ${{apiData?.metrics?.financial?.recent_month_sales | number:'1.2-2'}}
-                                            </div>
-                                            <div class="flex items-center">
-                                                <mat-icon
-                                                    class="mr-1 icon-size-5 text-red-500"
-                                                    [svgIcon]="'heroicons_solid:arrow-trending-up'"></mat-icon>
-                                                <div class="font-medium text-sm text-secondary leading-none whitespace-nowrap">
-                                                    <span class="text-red-500">Monthly</span>
-                                                    sales
-                                                </div>
-                                            </div>
+                                    <div class="flex flex-col mt-3 sm:mt-4">
+                                        <div
+                                            class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-none text-purple-600">
+                                            ${{ apiData?.metrics?.financial?.recent_month_sales | number:'1.2-2':'es' }}
                                         </div>
-                                        <div class="flex flex-col flex-auto ml-8">
-                                            <apx-chart
-                                                class="flex-auto w-full h-16"
-                                                [chart]="chartMonthlyExpenses.chart"
-                                                [colors]="chartMonthlyExpenses.colors"
-                                                [series]="chartMonthlyExpenses.series"
-                                                [stroke]="chartMonthlyExpenses.stroke"
-                                                [tooltip]="chartMonthlyExpenses.tooltip"
-                                                [xaxis]="chartMonthlyExpenses.xaxis"
-                                                [yaxis]="chartMonthlyExpenses.yaxis"></apx-chart>
+                                        <div class="flex items-center text-xs sm:text-sm mt-1">
+                                            <mat-icon *ngIf="(apiData?.metrics?.financial?.month_change || 0) >= 0"
+                                                      class="icon-size-4 text-green-500 mr-1"
+                                                      [svgIcon]="'heroicons_solid:arrow-trending-up'"></mat-icon>
+                                            <mat-icon *ngIf="(apiData?.metrics?.financial?.month_change || 0) < 0"
+                                                      class="icon-size-4 text-red-500 mr-1"
+                                                      [svgIcon]="'heroicons_solid:arrow-trending-down'"></mat-icon>
+                                            <span
+                                                [ngClass]="{'text-green-600': (apiData?.metrics?.financial?.month_change || 0) >= 0, 'text-red-600': (apiData?.metrics?.financial?.month_change || 0) < 0}">
+                                {{ apiData?.metrics?.financial?.month_change || 0 }}% vs mes anterior
+                            </span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Total Sales -->
-                                <div class="sm:col-span-2 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
+                                <!-- Ventas Semanales -->
+                                <div
+                                    class="flex flex-col p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-blue-500 transition-all duration-300">
                                     <div class="flex items-start justify-between">
-                                        <div class="text-lg font-medium tracking-tight leading-6 truncate">Total Sales</div>
-                                        <div class="ml-2 -mt-2 -mr-3">
-                                            <button
-                                                mat-icon-button
-                                                [matMenuTriggerFor]="yearlyExpensesMenu">
-                                                <mat-icon
-                                                    class="icon-size-5"
-                                                    [svgIcon]="'heroicons_mini:ellipsis-vertical'"></mat-icon>
-                                            </button>
-                                            <mat-menu #yearlyExpensesMenu="matMenu">
-                                                <button mat-menu-item>Details</button>
-                                            </mat-menu>
+                                        <div>
+                                            <div class="text-xs sm:text-sm text-blue-600 font-medium mb-1">ESTA SEMANA
+                                            </div>
+                                            <div
+                                                class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                                Ventas Semanales
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-center rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-blue-100">
+                                            <mat-icon class="text-blue-600"
+                                                      [svgIcon]="'heroicons_solid:chart-bar'"></mat-icon>
                                         </div>
                                     </div>
-                                    <div class="flex items-center mt-1">
-                                        <div class="flex flex-col">
-                                            <div class="text-3xl font-semibold tracking-tight leading-tight">
-                                                ${{apiData?.metrics?.financial?.total_sales | number:'1.2-2'}}
+                                    <div class="flex flex-col mt-3 sm:mt-4">
+                                        <div
+                                            class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-none text-blue-600">
+                                            ${{ apiData?.metrics?.financial?.recent_week_sales | number:'1.2-2':'es' }}
+                                        </div>
+                                        <div class="flex items-center text-xs sm:text-sm mt-1">
+                                            <mat-icon *ngIf="(apiData?.metrics?.financial?.week_change || 0) >= 0"
+                                                      class="icon-size-4 text-green-500 mr-1"
+                                                      [svgIcon]="'heroicons_solid:arrow-trending-up'"></mat-icon>
+                                            <mat-icon *ngIf="(apiData?.metrics?.financial?.week_change || 0) < 0"
+                                                      class="icon-size-4 text-red-500 mr-1"
+                                                      [svgIcon]="'heroicons_solid:arrow-trending-down'"></mat-icon>
+                                            <span
+                                                [ngClass]="{'text-green-600': (apiData?.metrics?.financial?.week_change || 0) >= 0, 'text-red-600': (apiData?.metrics?.financial?.week_change || 0) < 0}">
+                                {{ apiData?.metrics?.financial?.week_change || 0 }}% vs semana anterior
+                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Métricas Adicionales -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-6">
+                                <!-- Valor Promedio de Pedido -->
+                                <div
+                                    class="flex flex-col p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-green-500 transition-all duration-300">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="text-xs sm:text-sm text-green-600 font-medium mb-1">PROMEDIO
                                             </div>
+                                            <div
+                                                class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                                Valor Promedio de Pedido
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-center rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-green-100">
+                                            <mat-icon class="text-green-600"
+                                                      [svgIcon]="'heroicons_solid:shopping-bag'"></mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col mt-3 sm:mt-4">
+                                        <div
+                                            class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-none text-green-600">
+                                            ${{ apiData?.metrics?.financial?.avg_order_value | number:'1.2-2':'es' }}
+                                        </div>
+                                        <div class="mt-3 pt-3 border-t border-gray-200">
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-xs sm:text-sm text-gray-500">Total de pedidos:</span>
+                                                <span
+                                                    class="text-xs sm:text-sm font-medium">{{ apiData?.metrics?.total_orders || 0 }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Valor Total de Inventario -->
+                                <div
+                                    class="flex flex-col p-4 sm:p-6 bg-white shadow-md hover:shadow-lg rounded-xl overflow-hidden border-l-4 border-amber-500 transition-all duration-300">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="text-xs sm:text-sm text-amber-600 font-medium mb-1">INVENTARIO
+                                            </div>
+                                            <div
+                                                class="text-base sm:text-lg font-medium tracking-tight leading-tight text-gray-800">
+                                                Valor Total del Inventario
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="flex items-center justify-center rounded-full w-10 h-10 sm:w-12 sm:h-12 bg-amber-100">
+                                            <mat-icon class="text-amber-600"
+                                                      [svgIcon]="'heroicons_solid:cube'"></mat-icon>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col mt-3 sm:mt-4">
+                                        <div
+                                            class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-none text-amber-600">
+                                            ${{ apiData?.metrics?.financial?.total_inventory_value | number:'1.2-2':'es' }}
+                                        </div>
+                                        <div class="mt-3 pt-3 border-t border-gray-200">
+                                            <div class="flex justify-between items-center">
+                                                <span
+                                                    class="text-xs sm:text-sm text-gray-500">Total de productos:</span>
+                                                <span
+                                                    class="text-xs sm:text-sm font-medium">{{ apiData?.metrics?.total_products || 0 }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tendencia de Ventas -->
+                            <div
+                                class="flex flex-col bg-white rounded-xl shadow-md overflow-hidden transform transition-all hover:shadow-lg">
+                                <div
+                                    class="px-4 sm:px-6 py-3 sm:py-4 bg-indigo-50 border-b border-indigo-100 flex justify-between items-center">
+                                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">Tendencia de Ventas
+                                        Mensuales</h3>
+<!--                                    <button mat-stroked-button color="primary" class="min-w-[80px] text-xs sm:text-sm">-->
+<!--                                        Ver Detalles-->
+<!--                                    </button>-->
+                                </div>
+
+                                <!-- Tabla para pantallas medianas y grandes -->
+                                <div class="hidden sm:block px-4 sm:px-6 py-2 sm:py-4">
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full divide-y divide-gray-300">
+                                            <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Mes
+                                                </th>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Total
+                                                </th>
+                                                <th class="py-2 sm:py-3 px-2 sm:px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Cambio %
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="bg-white divide-y divide-gray-200">
+                                            <tr *ngFor="let item of apiData?.sales_trend?.monthly; trackBy: trackByFn"
+                                                class="hover:bg-gray-50">
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-900">
+                                                    {{ item.month | date:'MMMM yyyy':'':'es' }}
+                                                </td>
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 text-right">
+                                                    ${{ item.total | number:'1.2-2':'es' }}
+                                                </td>
+                                                <td class="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-right">
+                                                    <div class="flex items-center justify-end">
+                                                        <mat-icon *ngIf="(item.change || 0) > 0"
+                                                                  class="icon-size-4 text-green-500 mr-1"
+                                                                  [svgIcon]="'heroicons_solid:arrow-trending-up'"></mat-icon>
+                                                        <mat-icon *ngIf="(item.change || 0) < 0"
+                                                                  class="icon-size-4 text-red-500 mr-1"
+                                                                  [svgIcon]="'heroicons_solid:arrow-trending-down'"></mat-icon>
+                                                        <span
+                                                            [ngClass]="{'text-green-600': (item.change || 0) > 0, 'text-red-600': (item.change || 0) < 0, 'text-gray-500': (item.change || 0) === 0}">
+                                                {{ (item.change || 0) > 0 ? '+' : '' }}{{ item.change || 0 }}%
+                                            </span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Vista de tarjetas para móvil -->
+                                <div class="sm:hidden px-4 py-2 space-y-2">
+                                    <div *ngFor="let item of apiData?.sales_trend?.monthly; trackBy: trackByFn"
+                                         class="bg-gray-50 hover:bg-gray-100 rounded-lg p-3 shadow-sm">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span
+                                                class="font-medium text-sm text-gray-900">{{ item.month | date:'MMMM yyyy':'':'es' }}</span>
                                             <div class="flex items-center">
-                                                <mat-icon
-                                                    class="mr-1 icon-size-5 text-green-500"
-                                                    [svgIcon]="'heroicons_solid:arrow-trending-up'"></mat-icon>
-                                                <div class="font-medium text-sm text-secondary leading-none whitespace-nowrap">
-                                                    <span class="text-green-500">All time</span>
-                                                    sales
-                                                </div>
+                                                <mat-icon *ngIf="(item.change || 0) > 0"
+                                                          class="icon-size-4 text-green-500"
+                                                          [svgIcon]="'heroicons_solid:arrow-trending-up'"></mat-icon>
+                                                <mat-icon *ngIf="(item.change || 0) < 0"
+                                                          class="icon-size-4 text-red-500"
+                                                          [svgIcon]="'heroicons_solid:arrow-trending-down'"></mat-icon>
+                                                <span class="text-xs font-medium ml-1"
+                                                      [ngClass]="{'text-green-600': (item.change || 0) > 0, 'text-red-600': (item.change || 0) < 0, 'text-gray-500': (item.change || 0) === 0}">
+                                    {{ (item.change || 0) > 0 ? '+' : '' }}{{ item.change || 0 }}%
+                                </span>
                                             </div>
                                         </div>
-                                        <div class="flex flex-col flex-auto ml-8">
-                                            <apx-chart
-                                                class="flex-auto w-full h-16"
-                                                [chart]="chartYearlyExpenses.chart"
-                                                [colors]="chartYearlyExpenses.colors"
-                                                [series]="chartYearlyExpenses.series"
-                                                [stroke]="chartYearlyExpenses.stroke"
-                                                [tooltip]="chartYearlyExpenses.tooltip"
-                                                [xaxis]="chartYearlyExpenses.xaxis"
-                                                [yaxis]="chartYearlyExpenses.yaxis"></apx-chart>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-xs text-gray-500">Total ventas:</span>
+                                            <span
+                                                class="text-sm font-semibold text-indigo-700">${{ item.total | number:'1.2-2':'es' }}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Financial Details -->
-                            <div class="sm:col-span-6 flex flex-col flex-auto p-6 bg-card shadow rounded-2xl overflow-hidden">
-                                <div class="text-lg font-medium tracking-tight leading-6 truncate">Financial Details</div>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                                    <!-- Average Order Value -->
-                                    <div class="flex flex-col p-6 bg-card shadow rounded-xl overflow-hidden">
-                                        <div class="text-lg font-medium tracking-tight leading-6 truncate">Average Order Value</div>
-                                        <div class="flex flex-col items-center mt-4">
-                                            <div class="text-5xl font-semibold tracking-tight leading-none">${{apiData?.metrics?.financial?.avg_order_value | number:'1.2-2'}}</div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Total Inventory Value -->
-                                    <div class="flex flex-col p-6 bg-card shadow rounded-xl overflow -hidden">
-                                        <div class="text-lg font-medium tracking-tight leading-6 truncate">Total Inventory Value</div>
-                                        <div class="flex flex-col items-center mt-4">
-                                            <div class="text-5xl font-semibold tracking-tight leading-none">${{apiData?.metrics?.financial?.total_inventory_value | number:'1.2-2'}}</div>
-                                        </div>
-                                    </div>
-                                    <!-- Total Revenue -->
-                                    <div class="flex flex-col p-6 bg-card shadow rounded-xl overflow-hidden">
-                                        <div class="text-lg font-medium tracking-tight leading-6 truncate">Total Revenue</div>
-                                        <div class="flex flex-col items-center mt-4">
-                                            <div class="text-5xl font-semibold tracking-tight leading-none">${{apiData?.metrics?.financial?.total_revenue | number:'1.2-2'}}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ng-template>
-                </mat-tab>
-                <!-- Settings -->
-                <mat-tab label="Settings">
-                    <ng-template matTabContent>
-                        <div class="flex flex-col p-6 bg-card shadow rounded-2xl overflow-hidden">
-                            <div class="text-lg font-medium tracking-tight leading-6 truncate">Settings</div>
-                            <div class="flex flex-col mt-4">
-                                <button mat-flat-button color="primary">Manage Settings</button>
-                            </div>
+                            <!-- Gráfico de Tendencia (Opcional) -->
+                            <!--                            <div class="mt-6 flex flex-col bg-white rounded-xl shadow-md overflow-hidden">-->
+                            <!--                                <div class="px-4 sm:px-6 py-3 sm:py-4 bg-blue-50 border-b border-blue-100">-->
+                            <!--                                    <h3 class="text-base sm:text-lg font-semibold text-gray-800">Evolución de-->
+                            <!--                                        Ventas</h3>-->
+                            <!--                                </div>-->
+                            <!--                                <div class="p-4 sm:p-6 h-64 sm:h-80">-->
+                            <!--                                    &lt;!&ndash; Aquí puedes integrar un gráfico con ApexCharts &ndash;&gt;-->
+                            <!--                                    <div class="text-center text-gray-500 flex items-center justify-center h-full">-->
+                            <!--                                        <div>-->
+                            <!--                                            <mat-icon class="text-gray-400 icon-size-8 mb-2"-->
+                            <!--                                                      [svgIcon]="'heroicons_solid:chart-bar'"></mat-icon>-->
+                            <!--                                            <p>Gráfico de tendencias disponible próximamente</p>-->
+                            <!--                                        </div>-->
+                            <!--                                    </div>-->
+                            <!--                                </div>-->
+                            <!--                            </div>-->
                         </div>
                     </ng-template>
                 </mat-tab>

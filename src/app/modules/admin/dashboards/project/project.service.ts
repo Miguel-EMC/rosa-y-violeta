@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import {environment} from "../../../../../environments/environment";
+import { environment } from "../../../../../environments/environment";
 
 @Injectable({providedIn: 'root'})
 export class ProjectService {
@@ -40,9 +40,15 @@ export class ProjectService {
     }
 
     /**
-     * Verify API data structure
+     * Verify API data structure and update BehaviorSubjects
      */
     verifyApiData(): Observable<any> {
-        return this._httpClient.get(`${this.baseUrl}reports/dashboard/key_metrics`);
+        return this._httpClient.get(`${this.baseUrl}reports/dashboard/key_metrics`).pipe(
+            tap((response: any) => {
+                // Also update the BehaviorSubjects when verifying data
+                this._rawApiData.next(response);
+                this._data.next(response);
+            })
+        );
     }
 }
