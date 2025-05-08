@@ -164,11 +164,15 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
 
     }
 
-    openModal(id: number, nameProduct: string) : void {
-        this.productId = id;
-        this.nameProduct = nameProduct;
-        this.isModalVisible = true;
-        this._changeDetectorRef.markForCheck();
+    openModal(productId: number, nameProduct: string) {
+        const dialogRef = this.dialog.open(EditProductComponent, {
+            width: '800px',
+            data: { productId, nameProduct }
+        });
+
+        dialogRef.afterClosed().subscribe(() => {
+            // Handle any actions after closing, if needed
+        });
     }
 
     closeModal() : void{
@@ -342,47 +346,45 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
 
     /*** Create product ***/
     onCreateProduct() {
-        this.showAddProductModal = true;
-    }
-
-    onAddProductModalCancel() {
-        const confirm = this._fuseConfirmationService.open({
-            title: '¿Seguro que quieres cancelar?',
-            message: 'Se perderán los datos ingresados.',
-            actions: { confirm: { label: 'Sí, cancelar' }, cancel: { label: 'No' } }
+        const dialogRef = this.dialog.open(AddProductModalComponent, {
+            width: '600px',
+            data: {}
         });
-        confirm.afterClosed().subscribe(result => {
-            if (result === 'confirmed') {
-                this.showAddProductModal = false;
-                this._changeDetectorRef.detectChanges();
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.isLoading = true;
+                this._productsService.createProduct(result).subscribe({
+                    next: () => {
+                        this.isLoading = false;
+                        this.toastr.success('Producto añadido con éxito', 'Éxito');
+                        this.getProducts();
+                    },
+                    error: () => {
+                        this.isLoading = false;
+                        this.toastr.error('Error al crear el producto', 'Error');
+                    }
+                });
             }
         });
     }
-
-    onAddProductModalAdd(productData: any) {
-        this.isLoading = true;
-        this._productsService.createProduct(productData).subscribe({
-            next: () => {
-                this.showAddProductModal = false;
-                this.isLoading = false;
-                this.toastr.success('Producto añadido con éxito', 'Éxito');
-                this.getProducts();
-                this._changeDetectorRef.detectChanges();
-            },
-            error: () => {
-                this.isLoading = false;
-                this.toastr.error('Error al crear el producto', 'Error');
-                this._changeDetectorRef.detectChanges();
-            }
-        });
-    }
-
 
     /*** Edit product ***/
     openEditProductModal(productId: number) {
-        this.editProductId = productId;
-        this.showEditProductModal = true;
-        this._changeDetectorRef.markForCheck();
+        if (!productId) {
+            this.toastr.error('ID de producto inválido', 'Error');
+            return;
+        }
+        const dialogRef = this.dialog.open(EditProductModalComponent, {
+            width: '600px',
+            data: { productId }
+        });
+
+        dialogRef.afterClosed().subscribe(updatedProduct => {
+            if (updatedProduct) {
+                this.onProductUpdated(updatedProduct);
+            }
+        });
     }
 
     onProductUpdated(updatedProduct: Product) {

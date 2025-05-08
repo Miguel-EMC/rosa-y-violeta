@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {NgIf} from "@angular/common";
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-add-product-modal',
@@ -13,7 +14,9 @@ export class AddProductModalComponent {
     @Output() add = new EventEmitter<any>();
     form: FormGroup;
 
-    constructor(private fb: FormBuilder) {
+    constructor(private fb: FormBuilder,
+                private dialogRef: MatDialogRef<AddProductModalComponent>
+    ) {
         this.form = this.fb.group({
             name: ['', Validators.required],
             unit_price: ['', [Validators.required, Validators.min(0)]],
@@ -31,12 +34,12 @@ export class AddProductModalComponent {
     }
 
     onCancel() {
-        this.cancel.emit();
+        this.dialogRef.close();
     }
 
     onAdd() {
         if (this.form.valid) {
-            this.add.emit(this.form.value);
+            this.dialogRef.close(this.form.value);
         }
     }
 }

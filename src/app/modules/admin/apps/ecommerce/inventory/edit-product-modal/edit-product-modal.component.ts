@@ -4,6 +4,9 @@ import { NgIf } from '@angular/common';
 import { ProductsService, Product } from 'app/services/products.service';
 import { ToastrService } from 'ngx-toastr';
 import { FuseConfirmationService } from '@fuse/services/confirmation';
+import { Inject } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-edit-product-modal',
@@ -22,8 +25,12 @@ export class EditProductModalComponent implements OnInit {
         private fb: FormBuilder,
         private productsService: ProductsService,
         private toastr: ToastrService,
-        private _fuseConfirmationService: FuseConfirmationService
-    ) {}
+        private _fuseConfirmationService: FuseConfirmationService,
+        private dialogRef: MatDialogRef<EditProductModalComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any,
+    ) {
+        this.productId = data.productId;
+    }
 
     ngOnInit() {
         this.form = this.fb.group({
@@ -56,7 +63,7 @@ export class EditProductModalComponent implements OnInit {
         });
         confirm.afterClosed().subscribe(result => {
             if (result === 'confirmed') {
-                this.close.emit();
+                this.dialogRef.close();
             }
         });
     }
@@ -71,8 +78,7 @@ export class EditProductModalComponent implements OnInit {
         this.productsService.editProduct(this.productId, this.form.value).subscribe({
             next: (updatedProduct) => {
                 this.toastr.success('Producto editado con éxito', 'Éxito');
-                this.updated.emit(updatedProduct);
-                this.close.emit();
+                this.dialogRef.close(updatedProduct);
             },
             error: () => {
                 this.toastr.error('Error al editar el producto', 'Error');

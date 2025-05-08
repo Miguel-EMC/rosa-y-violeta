@@ -135,26 +135,3 @@
         </div>
     </div>
 </div>
-
-<!-- Modal para agregar clientes -->
-<app-edit-product
-    [isVisible]="isModalVisible"
-    [productId]="productId"
-    [nameProduct]="nameProduct"
-    (close)="closeModal()"
-></app-edit-product>
-
-<!-- Modal para agregar producto -->
-<app-add-product-modal
-    *ngIf="showAddProductModal"
-    (cancel)="onAddProductModalCancel()"
-    (add)="onAddProductModalAdd($event)">
-</app-add-product-modal>
-
-<!-- Modal para editar producto -->
-<app-edit-product-modal
-    *ngIf="showEditProductModal"
-    [productId]="editProductId"
-    (close)="showEditProductModal = false"
-    (updated)="onProductUpdated($event)">
-</app-edit-product-modal>
