@@ -22,7 +22,8 @@ import {CommonModule} from '@angular/common';
 import {MatPaginatorModule} from "@angular/material/paginator";
 import {AddClientModalComponent} from "../../ecommerce/inventory/add-client-modal/add-client-modal.component";
 import {ToastrService} from 'ngx-toastr';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: 'clients-list',
@@ -59,7 +60,9 @@ export class ClientsListComponent implements OnInit, OnDestroy {
         @Inject(DOCUMENT) private _document: any,
         private _router: Router,
         private _clientsService: ClientsService,
-        private _toastrService: ToastrService
+        private _toastrService: ToastrService,
+        private _dialog: MatDialog,
+
     ) {
     }
 
@@ -168,28 +171,30 @@ export class ClientsListComponent implements OnInit, OnDestroy {
     }
 
     createClient(): void {
-        this.showAddClientModal = true;
-        this._changeDetectorRef.markForCheck();
-    }
+        const dialogRef = this._dialog.open(AddClientModalComponent, {
+            width: '400px',
+            disableClose: true
+        });
 
-    onAddClientModalAdd(clientData: any) {
-        this._clientsService.createClient(clientData).subscribe({
-            next: (newClient) => {
-                this.showAddClientModal = false;
-                this._toastrService.success('Cliente añadido con éxito', 'Éxito');
-                this.loadClients();
-                this._changeDetectorRef.markForCheck();
-            },
-            error: () => {
-                this._toastrService.error('Error al crear el cliente', 'Error');
-                this._changeDetectorRef.markForCheck();
-            }
+        dialogRef.componentInstance.cancel.subscribe(() => {
+            dialogRef.close();
+        });
+
+        dialogRef.componentInstance.add.subscribe((clientData: any) => {
+            this._clientsService.createClient(clientData).subscribe({
+                next: () => {
+                    this._toastrService.success('Cliente añadido con éxito', 'Éxito');
+                    this.loadClients();
+                    dialogRef.close();
+                    this._changeDetectorRef.markForCheck();
+                },
+                error: () => {
+                    this._toastrService.error('Error al crear el cliente', 'Error');
+                    this._changeDetectorRef.markForCheck();
+                }
+            });
         });
     }
-
-    /**
-     * Delete client
-     */
 
     /**
      * Track by function for ngFor loops

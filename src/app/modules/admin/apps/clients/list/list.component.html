@@ -151,9 +151,3 @@
         </mat-drawer-content>
     </mat-drawer-container>
 </div>
-<!-- Add Client Modal -->
-<app-add-client-modal
-    *ngIf="showAddClientModal"
-    (cancel)="onAddClientModalCancel()"
-    (add)="onAddClientModalAdd($event)">
-</app-add-client-modal>
