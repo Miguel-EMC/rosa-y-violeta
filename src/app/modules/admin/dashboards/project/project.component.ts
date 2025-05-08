@@ -1,4 +1,4 @@
-import { CurrencyPipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { CurrencyPipe, NgClass, NgFor, NgIf, JsonPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -19,7 +19,9 @@ import { Subject, takeUntil } from 'rxjs';
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports        : [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule, NgFor, NgIf, MatTableModule, NgClass, CurrencyPipe],
+    imports        : [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule,
+        MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule,
+        NgFor, NgIf, MatTableModule, NgClass, CurrencyPipe, JsonPipe],
 })
 export class ProjectComponent implements OnInit, OnDestroy
 {
@@ -33,6 +35,8 @@ export class ProjectComponent implements OnInit, OnDestroy
     selectedProject: string = 'ACME Corp. Backend App';
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
+    apiData: any;
+    isVerifyingData: boolean = false;
     /**
      * Constructor
      */
@@ -52,35 +56,17 @@ export class ProjectComponent implements OnInit, OnDestroy
      */
     ngOnInit(): void
     {
-        // Get the data
+        this.verifyApiData();
         this._projectService.data$
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((data) =>
             {
-                // Store the data
                 this.data = data;
-
-                // Prepare the chart data
-                this._prepareChartData();
+                if (data) {
+                    this._prepareChartData();
+                }
             });
-
-        // Attach SVG fill fixer to all ApexCharts
-        window['Apex'] = {
-            chart: {
-                events: {
-                    mounted: (chart: any, options?: any): void =>
-                    {
-                        this._fixSvgFill(chart.el);
-                    },
-                    updated: (chart: any, options?: any): void =>
-                    {
-                        this._fixSvgFill(chart.el);
-                    },
-                },
-            },
-        };
     }
-
     /**
      * On destroy
      */
@@ -89,6 +75,27 @@ export class ProjectComponent implements OnInit, OnDestroy
         // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
+    }
+
+    /**
+     * Verify the API data structure
+     */
+    verifyApiData(): void {
+        this.isVerifyingData = true;
+
+        this._projectService.verifyApiData()
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe({
+                next: (response) => {
+                    this.apiData = response;
+                    this.isVerifyingData = false;
+                    console.log('API data structure:', response);
+                },
+                error: (error) => {
+                    console.error('Error fetching API data:', error);
+                    this.isVerifyingData = false;
+                }
+            });
     }
 
     // -----------------------------------------------------------------------------------------------------
