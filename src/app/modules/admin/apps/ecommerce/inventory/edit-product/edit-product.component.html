@@ -1,31 +1,17 @@
 <!-- Backdrop -->
 <div
-    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center overflow-y-auto"
-    *ngIf="isVisible"
->
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center overflow-y-auto">
     <!-- Modal content -->
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl p-10 m-4 max-h-[95vh] overflow-y-auto transition-all duration-200">
-        <div *ngIf="isLoading || isLoadingClients"
-             class="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 rounded-3xl">
-            <div class="flex flex-col items-center">
-                <div class="w-16 h-16 border-8 border-pink-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <span class="text-pink-700 font-semibold text-lg">Cargando información...</span>
-            </div>
-        </div>
-
-        <!-- Close button -->
-        <div class="flex justify-end">
-            <button mat-icon-button (click)="closeModal()">
-                <mat-icon [svgIcon]="'heroicons_outline:x-mark'" class="text-gray-600 text-3xl"></mat-icon>
-            </button>
-        </div>
-
+    <div
+        class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl p-10 m-4 max-h-[95vh] overflow-y-auto transition-all duration-200">
         <!-- Product Details Card -->
-        <div class="mb-8 p-6 rounded-2xl bg-pink-50 border border-pink-200 flex flex-col sm:flex-row items-center gap-6">
+        <div
+            class="mb-8 p-6 rounded-2xl bg-pink-50 border border-pink-200 flex flex-col sm:flex-row items-center gap-6">
             <div class="flex-1">
                 <div class="text-3xl font-extrabold text-pink-800">{{ nameProduct }}</div>
                 <div class="text-base text-pink-600 mt-2">ID: {{ productNum }}</div>
-                <div class="text-base text-pink-600 mt-2">Precio unitario: <span class="font-semibold">${{ productUnitPrice }}</span></div>
+                <div class="text-base text-pink-600 mt-2">Precio unitario: <span
+                    class="font-semibold">${{ productUnitPrice }}</span></div>
             </div>
         </div>
 
@@ -56,7 +42,8 @@
                 <div *ngIf="userLoading" class="absolute right-10 top-1/2 -translate-y-1/2">
                     <div class="w-5 h-5 border-2 border-pink-400 border-t-transparent rounded-full animate-spin"></div>
                 </div>
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUser" (optionSelected)="onUserSelected($event)">
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayUser"
+                                  (optionSelected)="onUserSelected($event)">
                     <mat-option *ngFor="let user of userResults" [value]="user">
                         <div>
                             <span class="font-semibold">{{ user.full_name }}</span>
@@ -87,7 +74,8 @@
         <!-- Lista de clientes en tabla -->
         <div class="mb-6">
             <h3 class="text-2xl font-semibold mb-4">Clientes asignados</h3>
-            <div *ngIf="!isLoadingClients && (!listClients || listClients.length === 0)" class="flex items-center justify-center py-8">
+            <div *ngIf="!isLoadingClients && (!listClients || listClients.length === 0)"
+                 class="flex items-center justify-center py-8">
                 <p class="text-gray-400 text-lg">Aún no has añadido clientes.</p>
             </div>
             <div *ngIf="!isLoadingClients && listClients?.length > 0" class="overflow-x-auto">
@@ -148,17 +136,24 @@
                 </table>
             </div>
         </div>
-
-        <!-- Actions -->
-        <div class="mt-8 flex justify-center space-x-4">
+        <!-- Actions & Close buttons grouped -->
+        <div class="mt-10 flex justify-center gap-6">
             <button
                 mat-flat-button
                 color="primary"
-                class="px-10 h-14 rounded-xl shadow bg-pink-600 hover:bg-pink-700 transition-colors text-xl"
+                class="px-10 h-14 rounded-2xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-xl font-bold transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300"
                 (click)="sendClientsForProduct()"
                 [disabled]="!hasChanges() || isLoading"
             >
-                {{ isLoading ? 'Enviando...' : 'Añadir' }}
+                <span class="text-white">Guardar cambios</span>
+            </button>
+            <button
+                mat-flat-button
+                color="warn"
+                class="px-10 h-14 rounded-2xl shadow-lg bg-gradient-to-r from-gray-400 to-gray-600 hover:from-gray-500 hover:to-gray-700 text-xl font-bold transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-300"
+                (click)="closeModal()"
+            >
+                <span class="text-white">Cerrar</span>
             </button>
         </div>
     </div>

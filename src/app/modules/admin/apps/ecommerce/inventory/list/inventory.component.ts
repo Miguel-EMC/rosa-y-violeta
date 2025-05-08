@@ -175,12 +175,6 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
         });
     }
 
-    closeModal() : void{
-        if (this.isModalVisible) {
-            this.isModalVisible = false;
-            this._changeDetectorRef.markForCheck();
-        }
-    }
 
     /**
      * Delete the selected product using the form data
@@ -316,6 +310,7 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
                 }),
             ).subscribe();
         }
+        this._changeDetectorRef.detectChanges();
     }
 
     /**
@@ -348,7 +343,8 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
     onCreateProduct() {
         const dialogRef = this.dialog.open(AddProductModalComponent, {
             width: '600px',
-            data: {}
+            data: {},
+            disableClose: true
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -377,7 +373,8 @@ export class InventoryListComponent implements OnInit, AfterViewInit, OnDestroy
         }
         const dialogRef = this.dialog.open(EditProductModalComponent, {
             width: '600px',
-            data: { productId }
+            data: { productId },
+            disableClose: true
         });
 
         dialogRef.afterClosed().subscribe(updatedProduct => {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import {Component, EventEmitter, Input, Output, OnInit, ChangeDetectorRef} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { ProductsService, Product } from 'app/services/products.service';
@@ -28,6 +28,7 @@ export class EditProductModalComponent implements OnInit {
         private _fuseConfirmationService: FuseConfirmationService,
         private dialogRef: MatDialogRef<EditProductModalComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
+        private _changeDetectorRef: ChangeDetectorRef
     ) {
         this.productId = data.productId;
     }
@@ -85,5 +86,9 @@ export class EditProductModalComponent implements OnInit {
                 this.loading = false;
             }
         });
+    }
+
+    ngAfterViewInit() {
+        this._changeDetectorRef.detectChanges();
     }
 }

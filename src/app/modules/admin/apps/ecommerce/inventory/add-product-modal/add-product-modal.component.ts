@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, Output, AfterViewInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {NgIf} from "@angular/common";
 import { MatDialogRef } from '@angular/material/dialog';
@@ -9,13 +9,14 @@ import { MatDialogRef } from '@angular/material/dialog';
     standalone: true,
     imports: [ReactiveFormsModule,NgIf]
 })
-export class AddProductModalComponent {
+export class AddProductModalComponent implements AfterViewInit{
     @Output() cancel = new EventEmitter<void>();
     @Output() add = new EventEmitter<any>();
     form: FormGroup;
 
     constructor(private fb: FormBuilder,
-                private dialogRef: MatDialogRef<AddProductModalComponent>
+                private dialogRef: MatDialogRef<AddProductModalComponent>,
+                private _changeDetectorRef: ChangeDetectorRef
     ) {
         this.form = this.fb.group({
             name: ['', Validators.required],
@@ -41,5 +42,9 @@ export class AddProductModalComponent {
         if (this.form.valid) {
             this.dialogRef.close(this.form.value);
         }
+    }
+
+    ngAfterViewInit() {
+        this._changeDetectorRef.detectChanges();
     }
 }

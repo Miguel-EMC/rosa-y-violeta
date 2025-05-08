@@ -25,7 +25,8 @@ import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
 import {ViewChild} from '@angular/core';
 import {AddClientModalComponent} from "../add-client-modal/add-client-modal.component";
-
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Inject } from '@angular/core';
 @Component({
     selector: 'app-edit-product',
     standalone: true,
@@ -42,8 +43,6 @@ import {AddClientModalComponent} from "../add-client-modal/add-client-modal.comp
     styleUrl: './edit-product.component.scss'
 })
 export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
-    @Input() isVisible: boolean = false;
-    @Output() close = new EventEmitter<void>();
     @Input() productId: number;
     @Input() nameProduct: string = '';
     @ViewChild(MatAutocompleteTrigger) autocompleteTrigger: MatAutocompleteTrigger;
@@ -79,8 +78,12 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         private _changeDetectorRef: ChangeDetectorRef,
         private _fuseConfirmationService: FuseConfirmationService,
         private toastr: ToastrService,
-        private _clientsService: ClientsService
+        private _clientsService: ClientsService,
+        private dialogRef: MatDialogRef<EditProductComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
+        this.productId = data.productId;
+        this.nameProduct = data.nameProduct;
     }
 
     ngOnInit(): void {
@@ -95,6 +98,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         if (this.productId) {
             this.productNum = this.productId;
             this.loadProductDetails(this.productNum);
+            this.getClients(this.productNum);
         }
     }
 
@@ -154,7 +158,8 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         this.loadUsers(this.lastSearchText, false);
     }
 
-    ngAfterViewInit(): void {
+    ngAfterViewInit() {
+        this._changeDetectorRef.detectChanges();
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -246,7 +251,7 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
                 this.isLoading = false;
                 this._productsService.notifyProductsUpdated();
                 this.loadProductDetails(this.productNum);
-                this.closeModal();
+                this.dialogRef.close();
                 this._changeDetectorRef.detectChanges();
             },
             error: (err) => {
@@ -263,12 +268,12 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
         const confirmation = this._fuseConfirmationService.open({
             title: 'Vas a eliminar a este usuario',
             message: '¿Estás seguro de querer eliminar al usuario?',
-            actions: {confirm: {label: 'Eliminar'}},
+            actions: { confirm: { label: 'Eliminar' } },
         });
 
         confirmation.afterClosed().subscribe(result => {
             if (result === 'confirmed') {
-                this.listClients[index]['toRemove'] = true;
+                this.listClients.splice(index, 1);
                 this._changeDetectorRef.detectChanges();
             }
         });
@@ -285,9 +290,16 @@ export class EditProductComponent implements OnInit, AfterViewInit, OnChanges {
 
 
     closeModal(): void {
-        this.isVisible = false;
-        document.body.style.overflow = 'auto';
-        this.close.emit();
+        const confirm = this._fuseConfirmationService.open({
+            title: '¿Seguro que quieres cerrar?',
+            message: 'Se perderán los cambios no guardados.',
+            actions: { confirm: { label: 'Sí, cerrar' }, cancel: { label: 'No' } }
+        });
+        confirm.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                this.dialogRef.close();
+            }
+        });
     }
 
     decreaseClientQuantity(i: number): void {
