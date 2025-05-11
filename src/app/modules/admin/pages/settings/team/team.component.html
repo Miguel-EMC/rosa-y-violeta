@@ -1,86 +1,100 @@
-<div class="w-full max-w-3xl">
-
-    <!-- Add team member -->
-    <div class="w-full">
-        <mat-form-field
-            class="w-full"
-            [subscriptSizing]="'dynamic'">
-            <mat-label>Add team members</mat-label>
-            <mat-icon
-                class="icon-size-5"
-                [svgIcon]="'heroicons_solid:user'"
-                matPrefix></mat-icon>
-            <input
-                matInput
-                [placeholder]="'Email address'">
-            <button
-                mat-icon-button
-                matSuffix>
-                <mat-icon
-                    class="icon-size-5"
-                    [svgIcon]="'heroicons_solid:plus-circle'"></mat-icon>
-            </button>
-        </mat-form-field>
-    </div>
-
-    <!-- Team members -->
-    <div class="flex flex-col mt-8 divide-y border-t border-b">
-        <ng-container *ngFor="let member of members; trackBy: trackByFn;">
-            <div class="flex flex-col sm:flex-row sm:items-center py-6">
-                <div class="flex items-center">
-                    <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden">
-                        <ng-container *ngIf="member.avatar">
-                            <img
-                                class="object-cover w-full h-full"
-                                [src]="member.avatar"
-                                alt="Contact avatar"/>
-                        </ng-container>
-                        <ng-container *ngIf="!member.avatar">
-                            <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                                {{member.name.charAt(0)}}
-                            </div>
-                        </ng-container>
-                    </div>
-                    <div class="ml-4">
-                        <div class="font-medium">{{member.name}}</div>
-                        <div class="text-secondary">{{member.email}}</div>
-                    </div>
+<div class="w-full max-w-4xl mx-auto">
+    <mat-card class="rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-pink-400 to-pink-600 p-6 text-white">
+            <div class="flex items-center">
+                <div class="p-3 bg-white/20 rounded-full mr-4">
+                    <mat-icon class="icon-size-8" [svgIcon]="'heroicons_solid:user-group'"></mat-icon>
                 </div>
-                <div class="flex items-center mt-4 sm:mt-0 sm:ml-auto">
-                    <div class="order-2 sm:order-1 ml-4 sm:ml-0">
-                        <mat-form-field
-                            class="fuse-mat-dense w-32"
-                            [subscriptSizing]="'dynamic'">
-                            <mat-select
-                                [panelClass]="'w-72 min-w-72 max-w-72 h-auto max-h-none'"
-                                [value]="member.role"
-                                disableOptionCentering
-                                #roleSelect="matSelect">
-                                <mat-select-trigger class="text-md">
-                                    <span>Role:</span>
-                                    <span class="ml-1 font-medium">{{roleSelect.value | titlecase}}</span>
-                                </mat-select-trigger>
-                                <ng-container *ngFor="let role of roles">
-                                    <mat-option
-                                        class="h-auto py-4 leading-none"
-                                        [value]="role.value">
-                                        <div class="font-medium">{{role.label}}</div>
-                                        <div class="mt-1.5 text-sm whitespace-normal leading-normal text-secondary">{{role.description}}</div>
-                                    </mat-option>
-                                </ng-container>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                    <div class="order-1 sm:order-2 sm:ml-3">
-                        <button mat-icon-button>
-                            <mat-icon
-                                class="text-hint"
-                                [svgIcon]="'heroicons_outline:trash'"></mat-icon>
-                        </button>
-                    </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Equipo</h1>
+                    <p class="text-pink-100">Administra los usuarios del sistema</p>
                 </div>
             </div>
-        </ng-container>
-    </div>
+        </div>
 
+        <!-- Form -->
+        <div class="p-6 bg-pink-50">
+            <!-- Add team member -->
+            <form [formGroup]="newUserForm" (ngSubmit)="createUser()" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div class="md:col-span-5">
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Nombre de Usuario</mat-label>
+                        <mat-icon class="text-pink-500" [svgIcon]="'heroicons_solid:user'" matPrefix></mat-icon>
+                        <input matInput formControlName="username" placeholder="Nombre de usuario">
+                        <mat-error *ngIf="newUserForm.get('username').hasError('required')">
+                            El nombre de usuario es obligatorio
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="md:col-span-5">
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Correo Electrónico</mat-label>
+                        <mat-icon class="text-pink-500" [svgIcon]="'heroicons_solid:envelope'" matPrefix></mat-icon>
+                        <input matInput formControlName="email" placeholder="email@ejemplo.com">
+                        <mat-error *ngIf="newUserForm.get('email').hasError('required')">
+                            El correo es obligatorio
+                        </mat-error>
+                        <mat-error *ngIf="newUserForm.get('email').hasError('email')">
+                            Formato de correo inválido
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="md:col-span-2 flex items-center">
+                    <button
+                        mat-flat-button
+                        type="submit"
+                        class="w-full h-14 bg-pink-500 hover:bg-pink-600 !text-white"
+                        [disabled]="newUserForm.invalid || isLoading">
+                        <mat-icon [svgIcon]="'heroicons_solid:plus'" class="mr-2"></mat-icon>
+                        Añadir
+                    </button>
+                </div>
+            </form>
+
+            <!-- Loading spinner -->
+            <div *ngIf="isLoading" class="flex justify-center my-4">
+                <mat-spinner [diameter]="40" color="warn"></mat-spinner>
+            </div>
+
+            <!-- Team members -->
+            <div class="flex flex-col mt-8 divide-y border-t border-b border-pink-200" *ngIf="!isLoading && users && users.length > 0">
+                <ng-container *ngFor="let user of users; trackBy: trackByFn">
+                    <div class="flex flex-col sm:flex-row sm:items-center py-6">
+                        <div class="flex items-center">
+                            <div class="flex flex-0 items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-pink-100 text-pink-800">
+                                <div class="flex items-center justify-center w-full h-full rounded-full text-lg uppercase">
+                                    {{user.username.charAt(0)}}
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <div class="font-medium">{{user.username}}</div>
+                                <div class="text-secondary">{{user.email}}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-4 sm:mt-0 sm:ml-auto">
+                            <div class="order-2 sm:order-1 ml-4 sm:ml-0">
+                                <div class="px-4 py-2 rounded bg-pink-100 text-pink-800">
+                                    <span>Admin</span>
+                                </div>
+                            </div>
+                            <div class="order-1 sm:order-2 sm:ml-3">
+                                <button mat-icon-button (click)="deleteUser(user)">
+                                    <mat-icon class="text-pink-500" [svgIcon]="'heroicons_outline:trash'"></mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+
+            <!-- Empty state -->
+            <div *ngIf="!isLoading && (!users || users.length === 0)" class="flex flex-col items-center justify-center p-8 mt-4 bg-white rounded-lg border border-pink-200">
+                <mat-icon [svgIcon]="'heroicons_outline:user-group'" class="text-pink-400" style="width: 64px; height: 64px;"></mat-icon>
+                <p class="mt-4 text-lg font-medium">No hay usuarios registrados</p>
+                <p class="text-gray-600">Añade un nuevo usuario utilizando el formulario de arriba</p>
+            </div>
+        </div>
+    </mat-card>
 </div>

@@ -16,7 +16,10 @@ export class AuthService {
     private baseUrl = environment.apiUrl;
 
     constructor() {
-
+        if (this.accessToken && this.refresh && this.getUserData()) {
+            this._authenticated = true;
+            this._userService.user = this.getUserData();
+        }
     }
 
     private get _userService(): UserService {
@@ -52,19 +55,26 @@ export class AuthService {
             confirm_password: confirmPassword
         });
     }
-
     signIn(credentials: { username: string; password: string }): Observable<any> {
         if (this._authenticated) {
             return throwError('User is already logged in.');
         }
-
         return this._httpClient.post<any>(`${this.baseUrl}token/`, credentials).pipe(
             switchMap((response: any) => {
                 if (response && response.access && response.refresh) {
                     this.accessToken = response.access;
                     this.refresh = response.refresh;
+                    this.storeUserData({
+                        id: response.id,
+                        email: response.email,
+                        username: response.username,
+                        is_active: response.is_active,
+                        is_superadmin: response.is_superadmin,
+                        role: response.role
+                    });
+
                     this._authenticated = true;
-                    this._userService.user = response.user;
+                    this._userService.user = response;
                     return of(response);
                 } else {
                     return throwError('Invalid response format: ' + JSON.stringify(response));
@@ -74,6 +84,15 @@ export class AuthService {
                 return throwError(error);
             })
         );
+    }
+
+    storeUserData(userData: any): void {
+        localStorage.setItem('userData', JSON.stringify(userData));
+    }
+
+    getUserData(): any {
+        const userData = localStorage.getItem('userData');
+        return userData ? JSON.parse(userData) : null;
     }
 
     signOut(): Observable<any> {
@@ -163,25 +182,22 @@ export class AuthService {
     }
 
     logout(): Observable<any> {
-        const accessToken = this.accessToken; // Access token should be used in the Authorization header
-        const refresh = this.refresh; // Refresh token should be sent in the request body
-
+        const accessToken = this.accessToken;
+        const refresh = this.refresh;
         if (!accessToken || !refresh) {
             return throwError('No access or refresh token available');
         }
-
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}` // Include access token in Authorization header
+            'Authorization': `Bearer ${accessToken}`
         });
-
         return this._httpClient.post<any>(`${this.baseUrl}logout/`, { refresh: refresh }, { headers }).pipe(
             switchMap(() => {
-                // Clear the tokens from local storage
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refresh');
+                localStorage.removeItem('userData');
                 this._authenticated = false;
-                this._router.navigate(['/sign-in']); // Redirect to login page or any other appropriate page
+                this._router.navigate(['/sign-in']);
                 return of(true);
             }),
             catchError((error) => {

@@ -1,119 +1,156 @@
 import { NgFor, NgIf, TitleCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { UserService, User } from 'app/services/user.service';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { NgClass } from '@angular/common';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ToastrService } from 'ngx-toastr';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
 
 @Component({
-    selector       : 'settings-team',
-    templateUrl    : './team.component.html',
-    encapsulation  : ViewEncapsulation.None,
+    selector: 'settings-team',
+    templateUrl: './team.component.html',
+    encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone     : true,
-    imports        : [MatFormFieldModule, MatIconModule, MatInputModule, MatButtonModule, NgFor, NgIf, MatSelectModule, MatOptionModule, TitleCasePipe],
+    standalone: true,
+    imports: [MatFormFieldModule, MatIconModule, MatInputModule, MatButtonModule, NgFor, NgIf,
+        MatSelectModule, MatOptionModule, TitleCasePipe, ReactiveFormsModule, FormsModule,
+        MatCardModule, NgClass, MatProgressSpinnerModule],
 })
-export class SettingsTeamComponent implements OnInit
-{
-    members: any[];
+export class SettingsTeamComponent implements OnInit {
+    users: User[] = [];
     roles: any[];
+    newUserForm: FormGroup;
+    isLoading = false;
+    totalUsers = 0;
+    currentPage = 0;
+    pageSize = 10;
 
-    /**
-     * Constructor
-     */
-    constructor()
-    {
+    constructor(
+        private _userService: UserService,
+        private _formBuilder: FormBuilder,
+        private _changeDetectorRef: ChangeDetectorRef,
+        private _toastr: ToastrService,
+        private _fuseConfirmationService: FuseConfirmationService
+    ) {
+        this.newUserForm = this._formBuilder.group({
+            email: ['', [Validators.required, Validators.email]],
+            username: ['', Validators.required]
+        });
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * On init
-     */
-    ngOnInit(): void
-    {
-        // Setup the team members
-        this.members = [
-            {
-                avatar: 'assets/images/avatars/male-01.jpg',
-                name  : 'Dejesus Michael',
-                email : 'dejesusmichael@mail.org',
-                role  : 'admin',
-            },
-            {
-                avatar: 'assets/images/avatars/male-03.jpg',
-                name  : 'Mclaughlin Steele',
-                email : 'mclaughlinsteele@mail.me',
-                role  : 'admin',
-            },
-            {
-                avatar: 'assets/images/avatars/female-02.jpg',
-                name  : 'Laverne Dodson',
-                email : 'lavernedodson@mail.ca',
-                role  : 'write',
-            },
-            {
-                avatar: 'assets/images/avatars/female-03.jpg',
-                name  : 'Trudy Berg',
-                email : 'trudyberg@mail.us',
-                role  : 'read',
-            },
-            {
-                avatar: 'assets/images/avatars/male-07.jpg',
-                name  : 'Lamb Underwood',
-                email : 'lambunderwood@mail.me',
-                role  : 'read',
-            },
-            {
-                avatar: 'assets/images/avatars/male-08.jpg',
-                name  : 'Mcleod Wagner',
-                email : 'mcleodwagner@mail.biz',
-                role  : 'read',
-            },
-            {
-                avatar: 'assets/images/avatars/female-07.jpg',
-                name  : 'Shannon Kennedy',
-                email : 'shannonkennedy@mail.ca',
-                role  : 'read',
-            },
-        ];
-
-        // Setup the roles
+    ngOnInit(): void {
+        this.loadUsers();
         this.roles = [
             {
-                label      : 'Read',
-                value      : 'read',
-                description: 'Can read and clone this repository. Can also open and comment on issues and pull requests.',
-            },
-            {
-                label      : 'Write',
-                value      : 'write',
-                description: 'Can read, clone, and push to this repository. Can also manage issues and pull requests.',
-            },
-            {
-                label      : 'Admin',
-                value      : 'admin',
-                description: 'Can read, clone, and push to this repository. Can also manage issues, pull requests, and repository settings, including adding collaborators.',
-            },
+                label: 'Admin',
+                value: 'admin',
+                description: 'Puede gestionar todos los recursos del sistema, incluidos usuarios y configuraciones.',
+            }
         ];
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
+    loadUsers(): void {
+        this.isLoading = true;
+        this._userService.getUsers()
+            .subscribe(
+                (response) => {
+                    this.users = response.results || [];
+                    this.totalUsers = response.count || 0;
+                    this.isLoading = false;
+                    this._changeDetectorRef.markForCheck();
+                },
+                (error) => {
+                    console.error('Error al cargar usuarios:', error);
+                    this._toastr.error('No se pudieron cargar los usuarios', 'Error');
+                    this.isLoading = false;
+                    this._changeDetectorRef.markForCheck();
+                }
+            );
+    }
 
-    /**
-     * Track by function for ngFor loops
-     *
-     * @param index
-     * @param item
-     */
-    trackByFn(index: number, item: any): any
-    {
+    createUser(): void {
+        if (this.newUserForm.invalid) {
+            return;
+        }
+        const { username, email } = this.newUserForm.value;
+        const newUser = {
+            username,
+            email,
+            password: username,
+            role: 'admin',
+            is_active: true,
+            is_superadmin: false
+        };
+        this.isLoading = true;
+        this._userService.createUser(newUser).subscribe(
+            (response) => {
+                this.users.unshift(response);
+                this.newUserForm.reset();
+                this._toastr.success('Usuario creado correctamente', 'Éxito');
+                this.isLoading = false;
+                this._changeDetectorRef.markForCheck();
+            },
+            (error) => {
+                this._toastr.error(error.error?.detail || 'Error al crear el usuario', 'Error');
+                this.isLoading = false;
+                this._changeDetectorRef.markForCheck();
+                console.error('Error creating user:', error);
+            }
+        );
+    }
+
+    deleteUser(user: User): void {
+        const confirmation = this._fuseConfirmationService.open({
+            title: 'Eliminar usuario',
+            message: `¿Está seguro de eliminar al usuario "${user.username}"?`,
+            icon: {
+                show: true,
+                name: 'heroicons_outline:trash',
+                color: 'warn'
+            },
+            actions: {
+                confirm: {
+                    show: true,
+                    label: 'Sí, eliminar',
+                    color: 'warn'
+                },
+                cancel: {
+                    show: true,
+                    label: 'No'
+                }
+            }
+        });
+
+        confirmation.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                this.isLoading = true;
+                this._userService.deleteUser(user.id).subscribe(
+                    () => {
+                        this.users = this.users.filter(u => u.id !== user.id);
+                        this._toastr.success('Usuario eliminado correctamente', 'Éxito');
+                        this.isLoading = false;
+                        this._changeDetectorRef.markForCheck();
+                    },
+                    (error) => {
+                        this._toastr.error('Error al eliminar el usuario', 'Error');
+                        this.isLoading = false;
+                        this._changeDetectorRef.markForCheck();
+                        console.error('Error deleting user:', error);
+                    }
+                );
+            }
+        });
+    }
+
+    trackByFn(index: number, item: User): any {
         return item.id || index;
     }
 }

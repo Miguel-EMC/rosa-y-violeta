@@ -1,188 +1,96 @@
-<div class="w-full max-w-3xl">
-
-    <!-- Form -->
-    <form [formGroup]="accountForm">
-
-        <!-- Section -->
-        <div class="w-full">
-            <div class="text-xl">Profile</div>
-            <div class="text-secondary">Following information is publicly displayed, be careful!</div>
-        </div>
-        <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
-            <!-- Name -->
-            <div class="sm:col-span-4">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Name</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:user'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'name'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- Username -->
-            <div class="sm:col-span-4">
-                <mat-form-field
-                    class="fuse-mat-emphasized-affix w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Username</mat-label>
-                    <div
-                        class="text-secondary"
-                        matPrefix>
-                        fusetheme.com/
-                    </div>
-                    <input
-                        [formControlName]="'username'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- Title -->
-            <div class="sm:col-span-2">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Title</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:briefcase'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'title'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- Company -->
-            <div class="sm:col-span-2">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Company</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:building-office-2'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'company'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- About -->
-            <div class="sm:col-span-4">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>About</mat-label>
-                    <textarea
-                        matInput
-                        [formControlName]="'about'"
-                        cdkTextareaAutosize
-                        [cdkAutosizeMinRows]="5"></textarea>
-                </mat-form-field>
-                <div class="mt-1 text-md text-hint">Brief description for your profile. Basic HTML and Emoji are allowed.</div>
+<div class="w-full max-w-4xl mx-auto">
+    <mat-card class="rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-pink-400 to-pink-600 p-6 text-white">
+            <div class="flex items-center">
+                <div class="p-3 bg-white/20 rounded-full mr-4">
+                    <mat-icon class="icon-size-8" [svgIcon]="'heroicons_solid:user-circle'"></mat-icon>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">Perfil de Usuario</h1>
+                    <p class="text-pink-100">Administra tu información personal</p>
+                </div>
             </div>
         </div>
 
-        <!-- Divider -->
-        <div class="my-10 border-t"></div>
+        <!-- Form -->
+        <form [formGroup]="accountForm" class="p-6 bg-pink-50">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Username -->
+                <div class="col-span-full">
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Nombre de Usuario</mat-label>
+                        <mat-icon class="text-pink-500" [svgIcon]="'heroicons_solid:user'" matPrefix></mat-icon>
+                        <input [formControlName]="'username'" matInput>
+                        <mat-error *ngIf="accountForm.get('username').hasError('required')">
+                            El nombre de usuario es obligatorio
+                        </mat-error>
+                    </mat-form-field>
+                </div>
 
-        <!-- Section -->
-        <div class="w-full">
-            <div class="text-xl">Personal Information</div>
-            <div class="text-secondary">Communication details in case we want to connect with you. These will be kept private.</div>
+                <!-- Email -->
+                <div class="col-span-full">
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Correo Electrónico</mat-label>
+                        <mat-icon class="text-pink-500" [svgIcon]="'heroicons_solid:envelope'" matPrefix></mat-icon>
+                        <input [formControlName]="'email'" matInput>
+                        <mat-error *ngIf="accountForm.get('email').hasError('required')">
+                            El correo electrónico es obligatorio
+                        </mat-error>
+                        <mat-error *ngIf="accountForm.get('email').hasError('email')">
+                            Por favor, introduce un correo electrónico válido
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <!-- Role -->
+                <div>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-label>Rol</mat-label>
+                        <mat-icon class="text-pink-500" [svgIcon]="'heroicons_solid:briefcase'" matPrefix></mat-icon>
+                        <input [formControlName]="'role'" matInput>
+                    </mat-form-field>
+                </div>
+
+                <!-- Active Status -->
+                <div class="flex items-center gap-3 bg-white rounded-lg p-4 h-14 shadow-sm border border-pink-100">
+                    <mat-icon class="text-pink-500" [svgIcon]="'heroicons_solid:check-circle'"></mat-icon>
+                    <span class="text-gray-700">Estado de la cuenta:</span>
+                    <mat-slide-toggle [formControlName]="'is_active'" [disabled]="true" color="warn">
+                        <span *ngIf="accountForm.get('is_active').value">Activo</span>
+                        <span *ngIf="!accountForm.get('is_active').value">Inactivo</span>
+                    </mat-slide-toggle>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end mt-8 pt-6 border-t border-pink-200">
+                <button mat-stroked-button type="button" class="px-6" [color]="'warn'">
+                    Cancelar
+                </button>
+                <button
+                    mat-flat-button
+                    type="button"
+                    [color]="'warn'"
+                    [disabled]="accountForm.invalid"
+                    (click)="saveUserData()"
+                    class="ml-4 px-8 bg-pink-500 hover:bg-pink-600">
+                    <mat-icon [svgIcon]="'heroicons_solid:save'" class="mr-2"></mat-icon>
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </mat-card>
+
+    <!-- Status message -->
+    <div *ngIf="saveStatus" class="mt-4 p-4 rounded-lg"
+         [ngClass]="{
+            'bg-pink-50 text-pink-800 border border-pink-200': saveStatus === 'success',
+            'bg-red-50 text-red-800 border border-red-200': saveStatus === 'error'
+        }">
+        <div class="flex items-center">
+            <mat-icon *ngIf="saveStatus === 'success'" [svgIcon]="'heroicons_solid:check-circle'" class="text-pink-600 mr-2"></mat-icon>
+            <mat-icon *ngIf="saveStatus === 'error'" [svgIcon]="'heroicons_solid:x-circle'" class="text-red-600 mr-2"></mat-icon>
+            <span>{{ statusMessage }}</span>
         </div>
-        <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
-            <!-- Email -->
-            <div class="sm:col-span-2">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Email</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:envelope'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'email'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- Phone -->
-            <div class="sm:col-span-2">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Phone</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:phone'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'phone'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- Country -->
-            <div class="sm:col-span-2">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Country</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:map-pin'"
-                        matPrefix></mat-icon>
-                    <mat-select [formControlName]="'country'">
-                        <mat-option [value]="'usa'">United States</mat-option>
-                        <mat-option [value]="'canada'">Canada</mat-option>
-                        <mat-option [value]="'mexico'">Mexico</mat-option>
-                        <mat-option [value]="'france'">France</mat-option>
-                        <mat-option [value]="'germany'">Germany</mat-option>
-                        <mat-option [value]="'italy'">Italy</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <!-- Language -->
-            <div class="sm:col-span-2">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Language</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:globe-alt'"
-                        matPrefix></mat-icon>
-                    <mat-select [formControlName]="'language'">
-                        <mat-option [value]="'english'">English</mat-option>
-                        <mat-option [value]="'french'">French</mat-option>
-                        <mat-option [value]="'spanish'">Spanish</mat-option>
-                        <mat-option [value]="'german'">German</mat-option>
-                        <mat-option [value]="'italian'">Italian</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-        </div>
-
-        <!-- Divider -->
-        <div class="mt-11 mb-10 border-t"></div>
-
-        <!-- Actions -->
-        <div class="flex items-center justify-end">
-            <button
-                mat-stroked-button
-                type="button">
-                Cancel
-            </button>
-            <button
-                class="ml-4"
-                mat-flat-button
-                type="button"
-                [color]="'primary'">Save
-            </button>
-        </div>
-    </form>
-
+    </div>
 </div>
