@@ -34,6 +34,16 @@
         <div class="text-xs text-gray-500 mt-1">Opcional: Código interno para inventario.</div>
     </div>
     <div class="mb-4">
+        <label class="font-semibold">Cantidad min al por mayor</label>
+        <input formControlName="wholesale_min_quantity" type="number" class="w-full border rounded-lg p-2 mt-1"
+               placeholder="Cantidad mínima al por mayor"/>
+        <div class="text-xs text-gray-500 mt-1">Opcional: Cantidad mínima para ventas al por mayor.</div>
+        <div *ngIf="form.get('wholesale_min_quantity')?.invalid && form.get('wholesale_min_quantity')?.touched"
+             class="text-red-500 text-sm">
+            La cantidad mínima al por mayor no puede ser negativa.
+        </div>
+    </div>
+    <div class="mb-4">
         <label class="font-semibold">Precio al por mayor</label>
         <input formControlName="wholesale_price" type="number" class="w-full border rounded-lg p-2 mt-1"
                placeholder="Precio al por mayor"/>
@@ -43,6 +53,7 @@
             El precio al por mayor no puede ser negativo.
         </div>
     </div>
+
     <div class="flex justify-end gap-2 mt-6">
         <button type="button" class="px-4 py-2 bg-gray-200 rounded-lg" (click)="onCancel()">Cancelar</button>
         <button type="submit" class="px-4 py-2 bg-pink-600 text-white rounded-lg">Editar producto</button>

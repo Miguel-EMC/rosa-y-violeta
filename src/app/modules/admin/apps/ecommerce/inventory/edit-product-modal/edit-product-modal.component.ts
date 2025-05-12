@@ -39,7 +39,8 @@ export class EditProductModalComponent implements OnInit {
             unit_price: ['', [Validators.required, Validators.min(0)]],
             stock: ['', [Validators.required, Validators.min(0), Validators.pattern('^[0-9]+$')]],
             sku: [''],
-            wholesale_price: ['', [Validators.min(0)]]
+            wholesale_price: ['', [Validators.min(0)]],
+            wholesale_min_quantity: ['', [Validators.min(0), Validators.pattern('^[0-9]+$')]],
         });
 
         this.loading = true;

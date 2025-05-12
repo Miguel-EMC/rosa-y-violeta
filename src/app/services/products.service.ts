@@ -26,6 +26,27 @@ export interface ProductsApiResponse {
     count: number;
     results: Product[];
 }
+
+export interface Brand {
+    id: number;
+    name: string;
+}
+
+export interface Category {
+    id: number;
+    name: string;
+}
+
+export interface BrandsApiResponse {
+    count: number;
+    results: Brand[];
+}
+
+export interface CategoriesApiResponse {
+    count: number;
+    results: Category[];
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -45,12 +66,12 @@ export class ProductsService {
     }
 
     getClientsForProduct(productId: number): Observable<any> {
-        return this.http.get(`${this.baseUrl}products/assign_product/by_product/${productId}/`);
+        return this.http.get(`${this.baseUrl}products/assign/by_product/${productId}/`);
     }
 
     sendClientsForProduct(productId: number, payload: any): Observable<any> {
         return this.http.post(
-            `${this.baseUrl}products/assign_product/by_product/${productId}/`,
+            `${this.baseUrl}products/assign/by_product/${productId}/`,
             payload
         );
     }
@@ -79,8 +100,57 @@ export class ProductsService {
     }
     searchProducts(body: { sku?: string; name?: string }, take = 10, skip = 0): Observable<ProductsApiResponse> {
         return this.http.post<ProductsApiResponse>(
-            `${this.baseUrl}products/assign_product/search_products/?take=${take}&skip=${skip}`,
+            `${this.baseUrl}products/assign/search_products/?take=${take}&skip=${skip}`,
             body
         );
+    }
+
+
+    getBrands(take = 10, skip = 0, orderBy?: string): Observable<BrandsApiResponse> {
+        let url = `${this.baseUrl}products/brands/?take=${take}&skip=${skip}`;
+        if (orderBy) {
+            url += `&orderBy=${orderBy}`;
+        }
+        return this.http.get<BrandsApiResponse>(url);
+    }
+    getBrandById(id: number): Observable<Brand> {
+        return this.http.get<Brand>(`${this.baseUrl}products/brands/${id}/`);
+    }
+    createBrand(brand: { name: string }): Observable<Brand> {
+        return this.http.post<Brand>(`${this.baseUrl}products/brands/`, brand);
+    }
+
+    updateBrand(id: number, brand: { name: string }): Observable<Brand> {
+        return this.http.patch<Brand>(`${this.baseUrl}products/brands/${id}/`, brand);
+    }
+
+    deleteBrand(id: number): Observable<any> {
+        return this.http.delete(`${this.baseUrl}products/brands/${id}/`);
+    }
+
+    // Category API methods
+    getCategories(take = 10, skip = 0, orderBy?: string): Observable<CategoriesApiResponse> {
+        let url = `${this.baseUrl}products/categories/?take=${take}&skip=${skip}`;
+        if (orderBy) {
+            url += `&orderBy=${orderBy}`;
+        }
+
+        return this.http.get<CategoriesApiResponse>(url);
+    }
+
+    getCategoryById(id: number): Observable<Category> {
+        return this.http.get<Category>(`${this.baseUrl}products/categories/${id}/`);
+    }
+
+    createCategory(category: { name: string }): Observable<Category> {
+        return this.http.post<Category>(`${this.baseUrl}products/categories/`, category);
+    }
+
+    updateCategory(id: number, category: { name: string }): Observable<Category> {
+        return this.http.patch<Category>(`${this.baseUrl}products/categories/${id}/`, category);
+    }
+
+    deleteCategory(id: number): Observable<any> {
+        return this.http.delete(`${this.baseUrl}products/categories/${id}/`);
     }
 }

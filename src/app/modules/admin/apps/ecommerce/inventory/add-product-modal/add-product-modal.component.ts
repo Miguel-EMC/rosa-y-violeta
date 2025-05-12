@@ -30,7 +30,8 @@ export class AddProductModalComponent implements AfterViewInit{
                 ]
             ],
             sku: [''],
-            wholesale_price: ['', [Validators.min(0)]]
+            wholesale_price: ['', [Validators.min(0)]],
+            wholesale_min_quantity: ['', [Validators.min(0), Validators.pattern('^[0-9]+$')]],
         });
     }
 
