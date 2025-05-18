@@ -36,8 +36,8 @@ export const defaultNavigation: FuseNavigationItem[] = [
     },
     {
         id      : 'apps',
-        title   : 'Contactos e Inventario',
-        subtitle: 'Aplicaciones de Contactos e Inventario de Corset Rosa y Violeta',
+        title   : 'Clientes e Inventario',
+        subtitle: 'Aplicaciones de Clientes e Inventario de Corset Rosa y Violeta',
         type    : 'group',
         icon    : 'heroicons_outline:home',
         children: [
@@ -59,89 +59,76 @@ export const defaultNavigation: FuseNavigationItem[] = [
         ],
     },
     //!Pages
-    // {
-    //     id      : 'pages',
-    //     title   : 'Pages',
-    //     subtitle: 'Custom made page designs',
-    //     type    : 'group',
-    //     icon    : 'heroicons_outline:document',
-    //     children: [
-    //
-    //         {
-    //             id      : 'pages.invoice',
-    //             title   : 'Invoice',
-    //             type    : 'collapsable',
-    //             icon    : 'heroicons_outline:calculator',
-    //             children: [
-    //                         {
-    //                             id   : 'pages.invoice.printable.compact',
-    //                             title: 'Compact',
-    //                             type : 'basic',
-    //                             link : '/pages/invoice/printable/compact',
-    //                         },
-    //                         {
-    //                             id   : 'pages.invoice.printable.modern',
-    //                             title: 'Modern',
-    //                             type : 'basic',
-    //                             link : '/pages/invoice/printable/modern',
-    //                         }
-    //             ],
-    //         },
-    //         // {
-    //         //     id   : 'pages.maintenance',
-    //         //     title: 'Maintenance',
-    //         //     type : 'basic',
-    //         //     icon : 'heroicons_outline:exclamation-triangle',
-    //         //     link : '/pages/maintenance',
-    //         // },
-    //         // {
-    //         //     id      : 'pages.pricing',
-    //         //     title   : 'Pricing',
-    //         //     type    : 'collapsable',
-    //         //     icon    : 'heroicons_outline:banknotes',
-    //         //     children: [
-    //         //         {
-    //         //             id   : 'pages.pricing.modern',
-    //         //             title: 'Modern',
-    //         //             type : 'basic',
-    //         //             link : '/pages/pricing/modern',
-    //         //         },
-    //         //         {
-    //         //             id   : 'pages.pricing.simple',
-    //         //             title: 'Simple',
-    //         //             type : 'basic',
-    //         //             link : '/pages/pricing/simple',
-    //         //         },
-    //         //         {
-    //         //             id   : 'pages.pricing.single',
-    //         //             title: 'Single',
-    //         //             type : 'basic',
-    //         //             link : '/pages/pricing/single',
-    //         //         },
-    //         //         {
-    //         //             id   : 'pages.pricing.table',
-    //         //             title: 'Table',
-    //         //             type : 'basic',
-    //         //             link : '/pages/pricing/table',
-    //         //         },
-    //         //     ],
-    //         // },
-    //         // {
-    //         //     id   : 'pages.profile',
-    //         //     title: 'Profile',
-    //         //     type : 'basic',
-    //         //     icon : 'heroicons_outline:user-circle',
-    //         //     link : '/pages/profile',
-    //         // },
-    //         // {
-    //         //     id   : 'pages.settings',
-    //         //     title: 'Settings',
-    //         //     type : 'basic',
-    //         //     icon : 'heroicons_outline:cog-8-tooth',
-    //         //     link : '/pages/settings',
-    //         // },
-    //     ],
-    // },
+    {
+        id      : 'pages',
+        title   : 'Explorar',
+        type    : 'group',
+        icon    : 'heroicons_outline:document',
+        children: [
+
+            {
+                id      : 'pages.invoice',
+                title   : 'Categorías y Marcas',
+                subtitle: 'Gestión de categorías y marcas de Corset Rosa y Violeta',
+                type    : 'basic',
+                icon    : 'heroicons_outline:swatch',
+                link : '/apps/explorer',
+            },
+            // {
+            //     id   : 'pages.maintenance',
+            //     title: 'Maintenance',
+            //     type : 'basic',
+            //     icon : 'heroicons_outline:exclamation-triangle',
+            //     link : '/pages/maintenance',
+            // },
+            // {
+            //     id      : 'pages.pricing',
+            //     title   : 'Pricing',
+            //     type    : 'collapsable',
+            //     icon    : 'heroicons_outline:banknotes',
+            //     children: [
+            //         {
+            //             id   : 'pages.pricing.modern',
+            //             title: 'Modern',
+            //             type : 'basic',
+            //             link : '/pages/pricing/modern',
+            //         },
+            //         {
+            //             id   : 'pages.pricing.simple',
+            //             title: 'Simple',
+            //             type : 'basic',
+            //             link : '/pages/pricing/simple',
+            //         },
+            //         {
+            //             id   : 'pages.pricing.single',
+            //             title: 'Single',
+            //             type : 'basic',
+            //             link : '/pages/pricing/single',
+            //         },
+            //         {
+            //             id   : 'pages.pricing.table',
+            //             title: 'Table',
+            //             type : 'basic',
+            //             link : '/pages/pricing/table',
+            //         },
+            //     ],
+            // },
+            // {
+            //     id   : 'pages.profile',
+            //     title: 'Profile',
+            //     type : 'basic',
+            //     icon : 'heroicons_outline:user-circle',
+            //     link : '/pages/profile',
+            // },
+            // {
+            //     id   : 'pages.settings',
+            //     title: 'Settings',
+            //     type : 'basic',
+            //     icon : 'heroicons_outline:cog-8-tooth',
+            //     link : '/pages/settings',
+            // },
+        ],
+    },
    //!UI
     /*{
         id      : 'user-interface',
