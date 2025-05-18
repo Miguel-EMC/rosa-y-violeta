@@ -1,326 +1,141 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Tag, Task } from 'app/modules/admin/apps/tasks/tasks.types';
-import { BehaviorSubject, filter, map, Observable, of, switchMap, take, tap, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
+import {environment} from "../../../../../environments/environment";
+
+export interface Product {
+    id: number;
+    name: string;
+    description?: string;
+    price?: number;
+    brand_id?: number;
+    category_id?: number;
+    active?: boolean;
+}
+
+export interface Brand {
+    id: number;
+    name: string;
+    description?: string;
+    active?: boolean;
+}
+
+export interface Category {
+    id: number;
+    name: string;
+    description?: string;
+    active?: boolean;
+}
+
+export interface ProductsApiResponse {
+    count: number;
+    results: Product[];
+}
+
+export interface BrandsApiResponse {
+    count: number;
+    results: Brand[];
+}
+
+export interface CategoriesApiResponse {
+    count: number;
+    results: Category[];
+}
 
 @Injectable({providedIn: 'root'})
-export class ExplorersService
-{
-    // Private
-    private _tags: BehaviorSubject<Tag[] | null> = new BehaviorSubject(null);
-    private _task: BehaviorSubject<Task | null> = new BehaviorSubject(null);
-    private _tasks: BehaviorSubject<Task[] | null> = new BehaviorSubject(null);
+export class ExplorersService {
+    private baseUrl = environment.apiUrl;
 
-    /**
-     * Constructor
-     */
-    constructor(private _httpClient: HttpClient)
-    {
-    }
+    constructor(private _httpClient: HttpClient) {}
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Accessors
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Getter for tags
-     */
-    get tags$(): Observable<Tag[]>
-    {
-        return this._tags.asObservable();
-    }
-
-    /**
-     * Getter for task
-     */
-    get task$(): Observable<Task>
-    {
-        return this._task.asObservable();
-    }
-
-    /**
-     * Getter for tasks
-     */
-    get tasks$(): Observable<Task[]>
-    {
-        return this._tasks.asObservable();
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Get tags
-     */
-    getTags(): Observable<Tag[]>
-    {
-        return this._httpClient.get<Tag[]>('api/apps/tasks/tags').pipe(
-            tap((response: any) =>
-            {
-                this._tags.next(response);
-            }),
+    // Products methods
+    getProducts(take = 10, skip = 0): Observable<ProductsApiResponse> {
+        return this._httpClient.get<ProductsApiResponse>(
+            `${this.baseUrl}products/?take=${take}&skip=${skip}`
         );
     }
 
-    /**
-     * Crate tag
-     *
-     * @param tag
-     */
-    createTag(tag: Tag): Observable<Tag>
-    {
-        return this.tags$.pipe(
-            take(1),
-            switchMap(tags => this._httpClient.post<Tag>('api/apps/tasks/tag', {tag}).pipe(
-                map((newTag) =>
-                {
-                    // Update the tags with the new tag
-                    this._tags.next([...tags, newTag]);
+    getProductById(id: number): Observable<Product> {
+        return this._httpClient.get<Product>(`${this.baseUrl}products/${id}/`);
+    }
 
-                    // Return new tag from observable
-                    return newTag;
-                }),
-            )),
+    createProduct(product: Omit<Product, 'id'>): Observable<Product> {
+        return this._httpClient.post<Product>(`${this.baseUrl}products/`, product);
+    }
+
+    updateProduct(id: number, product: Partial<Product>): Observable<Product> {
+        return this._httpClient.put<Product>(`${this.baseUrl}products/${id}/`, product);
+    }
+
+    deleteProduct(id: number): Observable<any> {
+        return this._httpClient.delete(`${this.baseUrl}products/${id}/`);
+    }
+
+    // Brand methods
+    getBrands(take = 10, skip = 0): Observable<BrandsApiResponse> {
+        return this._httpClient.get<BrandsApiResponse>(
+            `${this.baseUrl}products/brands/?take=${take}&skip=${skip}`
         );
     }
 
-    /**
-     * Update the tag
-     *
-     * @param id
-     * @param tag
-     */
-    updateTag(id: string, tag: Tag): Observable<Tag>
-    {
-        return this.tags$.pipe(
-            take(1),
-            switchMap(tags => this._httpClient.patch<Tag>('api/apps/tasks/tag', {
-                id,
-                tag,
-            }).pipe(
-                map((updatedTag) =>
-                {
-                    // Find the index of the updated tag
-                    const index = tags.findIndex(item => item.id === id);
+    getBrandById(id: number): Observable<Brand> {
+        return this._httpClient.get<Brand>(`${this.baseUrl}products/brands/${id}/`);
+    }
 
-                    // Update the tag
-                    tags[index] = updatedTag;
+    createBrand(brand: Omit<Brand, 'id'>): Observable<Brand> {
+        return this._httpClient.post<Brand>(`${this.baseUrl}products/brands/`, brand);
+    }
 
-                    // Update the tags
-                    this._tags.next(tags);
+    updateBrand(id: number, brand: Partial<Brand>): Observable<Brand> {
+        return this._httpClient.put<Brand>(`${this.baseUrl}products/brands/${id}/`, brand);
+    }
 
-                    // Return the updated tag
-                    return updatedTag;
-                }),
-            )),
+    deleteBrand(id: number): Observable<any> {
+        return this._httpClient.delete(`${this.baseUrl}products/brands/${id}/`);
+    }
+
+    // Category methods
+    getCategories(take = 10, skip = 0): Observable<CategoriesApiResponse> {
+        return this._httpClient.get<CategoriesApiResponse>(
+            `${this.baseUrl}products/categories/?take=${take}&skip=${skip}`
         );
     }
 
-    /**
-     * Delete the tag
-     *
-     * @param id
-     */
-    deleteTag(id: string): Observable<boolean>
-    {
-        return this.tags$.pipe(
-            take(1),
-            switchMap(tags => this._httpClient.delete('api/apps/tasks/tag', {params: {id}}).pipe(
-                map((isDeleted: boolean) =>
-                {
-                    // Find the index of the deleted tag
-                    const index = tags.findIndex(item => item.id === id);
+    getCategoryById(id: number): Observable<Category> {
+        return this._httpClient.get<Category>(`${this.baseUrl}products/categories/${id}/`);
+    }
 
-                    // Delete the tag
-                    tags.splice(index, 1);
+    createCategory(category: Omit<Category, 'id'>): Observable<Category> {
+        return this._httpClient.post<Category>(`${this.baseUrl}products/categories/`, category);
+    }
 
-                    // Update the tags
-                    this._tags.next(tags);
+    updateCategory(id: number, category: Partial<Category>): Observable<Category> {
+        return this._httpClient.put<Category>(`${this.baseUrl}products/categories/${id}/`, category);
+    }
 
-                    // Return the deleted status
-                    return isDeleted;
-                }),
-                filter(isDeleted => isDeleted),
-                switchMap(isDeleted => this.tasks$.pipe(
-                    take(1),
-                    map((tasks) =>
-                    {
-                        // Iterate through the tasks
-                        tasks.forEach((task) =>
-                        {
-                            const tagIndex = task.tags.findIndex(tag => tag === id);
+    deleteCategory(id: number): Observable<any> {
+        return this._httpClient.delete(`${this.baseUrl}products/categories/${id}/`);
+    }
 
-                            // If the task has a tag, remove it
-                            if ( tagIndex > -1 )
-                            {
-                                task.tags.splice(tagIndex, 1);
-                            }
-                        });
-
-                        // Return the deleted status
-                        return isDeleted;
-                    }),
-                )),
-            )),
+    // Search methods
+    searchProducts(body: { name?: string }, take = 10, skip = 0): Observable<ProductsApiResponse> {
+        return this._httpClient.post<ProductsApiResponse>(
+            `${this.baseUrl}products/search/?take=${take}&skip=${skip}`,
+            body
         );
     }
 
-    /**
-     * Get tasks
-     */
-    getTasks(): Observable<Task[]>
-    {
-        return this._httpClient.get<Task[]>('api/apps/tasks/all').pipe(
-            tap((response) =>
-            {
-                this._tasks.next(response);
-            }),
+    searchBrands(body: { name?: string }, take = 10, skip = 0): Observable<BrandsApiResponse> {
+        return this._httpClient.post<BrandsApiResponse>(
+            `${this.baseUrl}products/brands/search/?take=${take}&skip=${skip}`,
+            body
         );
     }
 
-    /**
-     * Update tasks orders
-     *
-     * @param tasks
-     */
-    updateTasksOrders(tasks: Task[]): Observable<Task[]>
-    {
-        return this._httpClient.patch<Task[]>('api/apps/tasks/order', {tasks});
-    }
-
-    /**
-     * Search tasks with given query
-     *
-     * @param query
-     */
-    searchTasks(query: string): Observable<Task[] | null>
-    {
-        return this._httpClient.get<Task[] | null>('api/apps/tasks/search', {params: {query}});
-    }
-
-    /**
-     * Get task by id
-     */
-    getTaskById(id: string): Observable<Task>
-    {
-        return this._tasks.pipe(
-            take(1),
-            map((tasks) =>
-            {
-                // Find the task
-                const task = tasks.find(item => item.id === id) || null;
-
-                // Update the task
-                this._task.next(task);
-
-                // Return the task
-                return task;
-            }),
-            switchMap((task) =>
-            {
-                if ( !task )
-                {
-                    return throwError('Could not found task with id of ' + id + '!');
-                }
-
-                return of(task);
-            }),
-        );
-    }
-
-    /**
-     * Create task
-     *
-     * @param type
-     */
-    createTask(type: string): Observable<Task>
-    {
-        return this.tasks$.pipe(
-            take(1),
-            switchMap(tasks => this._httpClient.post<Task>('api/apps/tasks/task', {type}).pipe(
-                map((newTask) =>
-                {
-                    // Update the tasks with the new task
-                    this._tasks.next([newTask, ...tasks]);
-
-                    // Return the new task
-                    return newTask;
-                }),
-            )),
-        );
-    }
-
-    /**
-     * Update task
-     *
-     * @param id
-     * @param task
-     */
-    updateTask(id: string, task: Task): Observable<Task>
-    {
-        return this.tasks$
-            .pipe(
-                take(1),
-                switchMap(tasks => this._httpClient.patch<Task>('api/apps/tasks/task', {
-                    id,
-                    task,
-                }).pipe(
-                    map((updatedTask) =>
-                    {
-                        // Find the index of the updated task
-                        const index = tasks.findIndex(item => item.id === id);
-
-                        // Update the task
-                        tasks[index] = updatedTask;
-
-                        // Update the tasks
-                        this._tasks.next(tasks);
-
-                        // Return the updated task
-                        return updatedTask;
-                    }),
-                    switchMap(updatedTask => this.task$.pipe(
-                        take(1),
-                        filter(item => item && item.id === id),
-                        tap(() =>
-                        {
-                            // Update the task if it's selected
-                            this._task.next(updatedTask);
-
-                            // Return the updated task
-                            return updatedTask;
-                        }),
-                    )),
-                )),
-            );
-    }
-
-    /**
-     * Delete the task
-     *
-     * @param id
-     */
-    deleteTask(id: string): Observable<boolean>
-    {
-        return this.tasks$.pipe(
-            take(1),
-            switchMap(tasks => this._httpClient.delete('api/apps/tasks/task', {params: {id}}).pipe(
-                map((isDeleted: boolean) =>
-                {
-                    // Find the index of the deleted task
-                    const index = tasks.findIndex(item => item.id === id);
-
-                    // Delete the task
-                    tasks.splice(index, 1);
-
-                    // Update the tasks
-                    this._tasks.next(tasks);
-
-                    // Return the deleted status
-                    return isDeleted;
-                }),
-            )),
+    searchCategories(body: { name?: string }, take = 10, skip = 0): Observable<CategoriesApiResponse> {
+        return this._httpClient.post<CategoriesApiResponse>(
+            `${this.baseUrl}products/categories/search/?take=${take}&skip=${skip}`,
+            body
         );
     }
 }

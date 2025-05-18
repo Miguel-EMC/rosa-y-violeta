@@ -12,6 +12,8 @@ export interface Product {
     stock: number;
     wholesale_price: string;
     unit_price: string;
+    category?: number;
+    category_name?: string;
 }
 
 export interface Client {

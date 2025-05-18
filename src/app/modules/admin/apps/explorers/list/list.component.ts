@@ -1,4 +1,4 @@
-import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPreview, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragHandle, CdkDragPreview, CdkDropList } from '@angular/cdk/drag-drop';
 import { DatePipe, DOCUMENT, NgClass, NgFor, NgIf, TitleCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,11 +6,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
-import { FuseNavigationService, FuseVerticalNavigationComponent } from '@fuse/components/navigation';
 import { FuseMediaWatcherService } from '@fuse/services/media-watcher';
-import { TasksService } from 'app/modules/admin/apps/tasks/tasks.service';
-import { Tag, Task } from 'app/modules/admin/apps/tasks/tasks.types';
-import { filter, fromEvent, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
+import { ExplorersService, Brand, Category } from '../explorers.service';
+import { ToastrService } from 'ngx-toastr';
+import { FuseConfirmationService } from '@fuse/services/confirmation';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @Component({
     selector       : 'explorers-list',
@@ -18,227 +19,204 @@ import { filter, fromEvent, Subject, takeUntil } from 'rxjs';
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports        : [MatSidenavModule, RouterOutlet, NgIf, MatButtonModule, MatTooltipModule, MatIconModule, CdkDropList, NgFor, CdkDrag, NgClass, CdkDragPreview, CdkDragHandle, RouterLink, TitleCasePipe, DatePipe],
+    imports: [MatSidenavModule, RouterOutlet, NgIf, MatButtonModule, MatTooltipModule, MatIconModule, CdkDropList, NgFor, CdkDrag, NgClass, CdkDragPreview, CdkDragHandle, RouterLink, TitleCasePipe, DatePipe, MatProgressSpinnerModule],
 })
 export class ExplorersListComponent implements OnInit, OnDestroy
 {
     @ViewChild('matDrawer', {static: true}) matDrawer: MatDrawer;
 
     drawerMode: 'side' | 'over';
-    selectedTask: Task;
-    tags: Tag[];
-    tasks: Task[];
-    tasksCount: any = {
-        completed : 0,
-        incomplete: 0,
-        total     : 0,
-    };
+    marcas: Brand[] = [];
+    categorias: Category[] = [];
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
-    /**
-     * Constructor
-     */
     constructor(
         private _activatedRoute: ActivatedRoute,
         private _changeDetectorRef: ChangeDetectorRef,
         @Inject(DOCUMENT) private _document: any,
         private _router: Router,
-        private _tasksService: TasksService,
+        private _explorersService: ExplorersService,
         private _fuseMediaWatcherService: FuseMediaWatcherService,
-        private _fuseNavigationService: FuseNavigationService,
-    )
-    {
-    }
+        private _toastrService: ToastrService,
+        private _fuseConfirmationService: FuseConfirmationService
+    ) {}
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Lifecycle hooks
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * On init
-     */
     ngOnInit(): void
     {
-        // Get the tags
-        this._tasksService.tags$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((tags: Tag[]) =>
-            {
-                this.tags = tags;
+        // Cargar marcas y categorías
+        this.cargarMarcas();
+        this.cargarCategorias();
 
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Get the tasks
-        this._tasksService.tasks$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((tasks: Task[]) =>
-            {
-                this.tasks = tasks;
-
-                // Update the counts
-                this.tasksCount.total = this.tasks.filter(task => task.type === 'task').length;
-                this.tasksCount.completed = this.tasks.filter(task => task.type === 'task' && task.completed).length;
-                this.tasksCount.incomplete = this.tasksCount.total - this.tasksCount.completed;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-
-                // Update the count on the navigation
-                setTimeout(() =>
-                {
-                    // Get the component -> navigation data -> item
-                    const mainNavigationComponent = this._fuseNavigationService.getComponent<FuseVerticalNavigationComponent>('mainNavigation');
-
-                    // If the main navigation component exists...
-                    if ( mainNavigationComponent )
-                    {
-                        const mainNavigation = mainNavigationComponent.navigation;
-                        const menuItem = this._fuseNavigationService.getItem('apps.tasks', mainNavigation);
-
-                        // Update the subtitle of the item
-                        menuItem.subtitle = this.tasksCount.incomplete + ' remaining tasks';
-
-                        // Refresh the navigation
-                        mainNavigationComponent.refresh();
-                    }
-                });
-            });
-
-        // Get the task
-        this._tasksService.task$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((task: Task) =>
-            {
-                this.selectedTask = task;
-
-                // Mark for check
-                this._changeDetectorRef.markForCheck();
-            });
-
-        // Subscribe to media query change
+        // Configurar el drawer
         this._fuseMediaWatcherService.onMediaQueryChange$('(min-width: 1440px)')
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((state) =>
-            {
-                // Calculate the drawer mode
+            .subscribe((state) => {
                 this.drawerMode = state.matches ? 'side' : 'over';
-
-                // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
 
-        // Listen for shortcuts
-        fromEvent(this._document, 'keydown')
-            .pipe(
-                takeUntil(this._unsubscribeAll),
-                filter<KeyboardEvent>(event =>
-                    (event.ctrlKey === true || event.metaKey) // Ctrl or Cmd
-                    && (event.key === '/' || event.key === '.'), // '/' or '.' key
-                ),
-            )
-            .subscribe((event: KeyboardEvent) =>
-            {
-                // If the '/' pressed
-                if ( event.key === '/' )
-                {
-                    this.createTask('task');
+        // Monitor route changes to open the drawer when navigating to detail routes
+        this._activatedRoute.children.forEach(child => {
+            child.url.pipe(takeUntil(this._unsubscribeAll)).subscribe(() => {
+                // If we're on a details route, open the drawer
+                if (this._router.url.includes('crear-') || this._router.url.includes('editar-')) {
+                    this.matDrawer.open();
                 }
-
-                // If the '.' pressed
-                if ( event.key === '.' )
-                {
-                    this.createTask('section');
-                }
+                this._changeDetectorRef.markForCheck();
             });
+        });
     }
 
-    /**
-     * On destroy
-     */
     ngOnDestroy(): void
     {
-        // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
     }
 
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
+    cargarMarcas(): void
+    {
+        this._explorersService.getBrands(100, 0)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe({
+                next: (response) => {
+                    this.marcas = response.results;
+                    this._changeDetectorRef.markForCheck();
+                },
+                error: () => {
+                    this._toastrService.error('Error al cargar las marcas', 'Error');
+                }
+            });
+    }
 
-    /**
-     * On backdrop clicked
-     */
+    cargarCategorias(): void
+    {
+        this._explorersService.getCategories(100, 0)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe({
+                next: (response) => {
+                    this.categorias = response.results;
+                    this._changeDetectorRef.markForCheck();
+                },
+                error: () => {
+                    this._toastrService.error('Error al cargar las categorías', 'Error');
+                }
+            });
+    }
+
     onBackdropClicked(): void
     {
-        // Go back to the list
         this._router.navigate(['./'], {relativeTo: this._activatedRoute});
-
-        // Mark for check
         this._changeDetectorRef.markForCheck();
     }
 
-    /**
-     * Create task
-     *
-     * @param type
-     */
-    createTask(type: 'task' | 'section'): void
+    crearMarca(): void
     {
-        // Create the task
-        this._tasksService.createTask(type).subscribe((newTask) =>
-        {
-            // Go to the new task
-            this._router.navigate(['./', newTask.id], {relativeTo: this._activatedRoute});
+        this._router.navigate(['./crear-marca'], {relativeTo: this._activatedRoute})
+            .then(() => {
+                // Ensure the drawer is opened
+                if (!this.matDrawer.opened) {
+                    this.matDrawer.open();
+                }
+                this._changeDetectorRef.markForCheck();
+            });
+    }
 
-            // Mark for check
-            this._changeDetectorRef.markForCheck();
+    crearCategoria(): void
+    {
+        this._router.navigate(['./crear-categoria'], {relativeTo: this._activatedRoute})
+            .then(() => {
+                // Ensure the drawer is opened
+                if (!this.matDrawer.opened) {
+                    this.matDrawer.open();
+                }
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    editarMarca(marca: Brand): void
+    {
+        this._router.navigate(['./editar-marca', marca.id], {relativeTo: this._activatedRoute})
+            .then(() => {
+                // Ensure the drawer is opened
+                if (!this.matDrawer.opened) {
+                    this.matDrawer.open();
+                }
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    editarCategoria(categoria: Category): void
+    {
+        this._router.navigate(['./editar-categoria', categoria.id], {relativeTo: this._activatedRoute})
+            .then(() => {
+                // Ensure the drawer is opened
+                if (!this.matDrawer.opened) {
+                    this.matDrawer.open();
+                }
+                this._changeDetectorRef.markForCheck();
+            });
+    }
+
+    eliminarMarca(marca: Brand): void
+    {
+        const confirmacion = this._fuseConfirmationService.open({
+            title  : 'Eliminar marca',
+            message: `¿Estás seguro de que quieres eliminar la marca "${marca.name}"? Esta acción no se puede deshacer.`,
+            actions: {
+                confirm: {
+                    label: 'Eliminar'
+                },
+                cancel: {
+                    label: 'Cancelar'
+                }
+            }
+        });
+
+        confirmacion.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                this._explorersService.deleteBrand(marca.id).subscribe({
+                    next: () => {
+                        this._toastrService.success('Marca eliminada correctamente', 'Éxito');
+                        this.cargarMarcas();
+                    },
+                    error: () => {
+                        this._toastrService.error('Error al eliminar la marca', 'Error');
+                    }
+                });
+            }
         });
     }
 
-    /**
-     * Toggle the completed status
-     * of the given task
-     *
-     * @param task
-     */
-    toggleCompleted(task: Task): void
+    eliminarCategoria(categoria: Category): void
     {
-        // Toggle the completed status
-        task.completed = !task.completed;
+        const confirmacion = this._fuseConfirmationService.open({
+            title  : 'Eliminar categoría',
+            message: `¿Estás seguro de que quieres eliminar la categoría "${categoria.name}"? Esta acción no se puede deshacer.`,
+            actions: {
+                confirm: {
+                    label: 'Eliminar'
+                },
+                cancel: {
+                    label: 'Cancelar'
+                }
+            }
+        });
 
-        // Update the task on the server
-        this._tasksService.updateTask(task.id, task).subscribe();
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
+        confirmacion.afterClosed().subscribe(result => {
+            if (result === 'confirmed') {
+                this._explorersService.deleteCategory(categoria.id).subscribe({
+                    next: () => {
+                        this._toastrService.success('Categoría eliminada correctamente', 'Éxito');
+                        this.cargarCategorias();
+                    },
+                    error: () => {
+                        this._toastrService.error('Error al eliminar la categoría', 'Error');
+                    }
+                });
+            }
+        });
     }
 
-    /**
-     * Task dropped
-     *
-     * @param event
-     */
-    dropped(event: CdkDragDrop<Task[]>): void
-    {
-        // Move the item in the array
-        moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-
-        // Save the new order
-        this._tasksService.updateTasksOrders(event.container.data).subscribe();
-
-        // Mark for check
-        this._changeDetectorRef.markForCheck();
-    }
-
-    /**
-     * Track by function for ngFor loops
-     *
-     * @param index
-     * @param item
-     */
     trackByFn(index: number, item: any): any
     {
         return item.id || index;

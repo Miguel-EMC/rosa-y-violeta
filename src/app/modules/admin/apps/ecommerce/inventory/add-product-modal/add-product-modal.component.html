@@ -41,6 +41,40 @@
             La cantidad mínima al por mayor no puede ser negativa.
         </div>
     </div>
+    <!-- Classification Section -->
+    <div class="bg-gray-50 rounded-lg p-6">
+        <p class="text-xl font-semibold mb-5 text-gray-800 flex items-center">
+            <span class="bg-pink-600 w-1.5 h-6 rounded mr-2"></span>
+            Clasificación
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Marca</mat-label>
+                <input type="text" matInput formControlName="brand" [matAutocomplete]="brandAuto">
+                <mat-autocomplete #brandAuto="matAutocomplete" [displayWith]="displayBrandFn.bind(this)">
+                    <mat-option [value]="null">Ninguna</mat-option>
+                    <mat-option *ngFor="let brand of filteredBrands | async" [value]="brand.id">
+                        {{brand.name}}
+                    </mat-option>
+                </mat-autocomplete>
+                <mat-hint>Seleccione la marca del producto</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Categoría</mat-label>
+                <input type="text" matInput formControlName="category" [matAutocomplete]="categoryAuto">
+                <mat-autocomplete #categoryAuto="matAutocomplete" [displayWith]="displayCategoryFn.bind(this)">
+                    <mat-option [value]="null">Ninguna</mat-option>
+                    <mat-option *ngFor="let category of filteredCategories | async" [value]="category.id">
+                        {{category.name}}
+                    </mat-option>
+                </mat-autocomplete>
+                <mat-hint>Seleccione la categoría del producto</mat-hint>
+            </mat-form-field>
+        </div>
+    </div>
+
     <div class="mb-4">
         <label class="font-semibold">Precio al por mayor</label>
         <input formControlName="wholesale_price" type="number" class="w-full border rounded-lg p-2 mt-1"/>
