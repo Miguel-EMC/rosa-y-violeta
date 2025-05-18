@@ -1,0 +1,202 @@
+<div class="absolute inset-0 flex flex-col min-w-0 overflow-hidden">
+    <mat-drawer-container
+        class="flex-auto h-full bg-card dark:bg-transparent"
+        (backdropClick)="onBackdropClicked()">
+
+        <!-- Drawer -->
+        <mat-drawer
+            class="w-full sm:w-120 md:w-160 dark:bg-gray-900"
+            [mode]="drawerMode"
+            [opened]="false"
+            [position]="'end'"
+            [disableClose]="true"
+            #matDrawer>
+            <router-outlet></router-outlet>
+        </mat-drawer>
+
+        <mat-drawer-content class="flex flex-col">
+            <!-- Main -->
+            <div class="flex flex-col flex-auto">
+                <!-- Header -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between p-6 sm:p-8 bg-card shadow-sm dark:bg-gray-800 border-b">
+                    <div>
+                        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight leading-none mb-1">Administración de Datos</h1>
+                        <p class="text-secondary text-sm sm:text-base">
+                            Gestión de marcas y categorías del sistema
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="flex flex-col lg:flex-row gap-6 p-6 md:p-8 overflow-y-auto">
+
+                    <!-- Sección de Marcas -->
+                    <div class="flex-1 bg-card rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 bg-primary-50 dark:bg-primary-900 border-b border-primary-100 dark:border-primary-800">
+                            <div class="flex items-center mb-3 sm:mb-0">
+                                <mat-icon svgIcon="heroicons_outline:tag" class="icon-size-6 mr-3 text-primary-600 dark:text-primary-400"></mat-icon>
+                                <h2 class="text-xl sm:text-2xl font-bold">Marcas</h2>
+                            </div>
+                            <button
+                                mat-flat-button
+                                color="primary"
+                                class="min-w-max w-full sm:w-auto shadow-sm"
+                                (click)="crearMarca()">
+                                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                <span class="ml-2">Nueva Marca</span>
+                            </button>
+                        </div>
+
+                        <!-- Loading spinner -->
+                        <div *ngIf="!marcas.length && false" class="flex justify-center items-center p-8">
+                            <mat-spinner [diameter]="40"></mat-spinner>
+                        </div>
+
+                        <!-- Table container with max height -->
+                        <div class="overflow-x-auto max-h-[calc(100vh-300px)]">
+                            <table class="w-full min-w-full">
+                                <thead class="sticky top-0 bg-gray-50 dark:bg-gray-800 z-10">
+                                <tr class="border-b">
+                                    <th class="p-4 text-left font-semibold w-16 sm:w-24">ID</th>
+                                    <th class="p-4 text-left font-semibold">Nombre</th>
+                                    <th class="p-4 text-right font-semibold w-24 sm:w-32">Acciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <ng-container *ngIf="marcas.length > 0; else noMarcas">
+                                    <tr *ngFor="let marca of marcas; trackBy: trackByFn"
+                                        class="border-b hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                                        <td class="p-4 text-sm">
+                                            <span class="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{{marca.id}}</span>
+                                        </td>
+                                        <td class="p-4 font-medium text-primary-800 dark:text-primary-200">{{marca.name}}</td>
+                                        <td class="p-2 text-right">
+                                            <div class="flex justify-end space-x-1">
+                                                <button
+                                                    mat-icon-button
+                                                    class="text-gray-600 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400"
+                                                    [matTooltip]="'Editar'"
+                                                    (click)="editarMarca(marca)">
+                                                    <mat-icon svgIcon="heroicons_outline:pencil-square"></mat-icon>
+                                                </button>
+                                                <button
+                                                    mat-icon-button
+                                                    class="text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400"
+                                                    [matTooltip]="'Eliminar'"
+                                                    (click)="eliminarMarca(marca)">
+                                                    <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                                <ng-template #noMarcas>
+                                    <tr>
+                                        <td colspan="3" class="p-8">
+                                            <div class="flex flex-col items-center justify-center text-center p-4">
+                                                <mat-icon svgIcon="heroicons_outline:face-frown" class="icon-size-16 text-gray-300 dark:text-gray-600 mb-4"></mat-icon>
+                                                <h3 class="text-lg font-medium mb-2">No hay marcas disponibles</h3>
+                                                <p class="text-secondary max-w-md mb-4">Crea una nueva marca para comenzar a gestionar tus productos</p>
+                                                <button
+                                                    mat-flat-button
+                                                    color="primary"
+                                                    (click)="crearMarca()">
+                                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                                    <span class="ml-2">Nueva Marca</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Sección de Categorías -->
+                    <div class="flex-1 bg-card rounded-xl shadow overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-lg">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 bg-green-50 dark:bg-green-900 border-b border-green-100 dark:border-green-800">
+                            <div class="flex items-center mb-3 sm:mb-0">
+                                <mat-icon svgIcon="heroicons_outline:squares-2x2" class="icon-size-6 mr-3 text-green-600 dark:text-green-400"></mat-icon>
+                                <h2 class="text-xl sm:text-2xl font-bold">Categorías</h2>
+                            </div>
+                            <button
+                                mat-flat-button
+                                color="accent"
+                                class="min-w-max w-full sm:w-auto shadow-sm"
+                                (click)="crearCategoria()">
+                                <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                <span class="ml-2">Nueva Categoría</span>
+                            </button>
+                        </div>
+
+                        <!-- Loading spinner -->
+                        <div *ngIf="!categorias.length && false" class="flex justify-center items-center p-8">
+                            <mat-spinner [diameter]="40" color="accent"></mat-spinner>
+                        </div>
+
+                        <!-- Table container with max height -->
+                        <div class="overflow-x-auto max-h-[calc(100vh-300px)]">
+                            <table class="w-full min-w-full">
+                                <thead class="sticky top-0 bg-gray-50 dark:bg-gray-800 z-10">
+                                <tr class="border-b">
+                                    <th class="p-4 text-left font-semibold w-16 sm:w-24">ID</th>
+                                    <th class="p-4 text-left font-semibold">Nombre</th>
+                                    <th class="p-4 text-right font-semibold w-24 sm:w-32">Acciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <ng-container *ngIf="categorias.length > 0; else noCategorias">
+                                    <tr *ngFor="let categoria of categorias; trackBy: trackByFn"
+                                        class="border-b hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                                        <td class="p-4 text-sm">
+                                            <span class="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{{categoria.id}}</span>
+                                        </td>
+                                        <td class="p-4 font-medium text-green-800 dark:text-green-200">{{categoria.name}}</td>
+                                        <td class="p-2 text-right">
+                                            <div class="flex justify-end space-x-1">
+                                                <button
+                                                    mat-icon-button
+                                                    class="text-gray-600 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400"
+                                                    [matTooltip]="'Editar'"
+                                                    (click)="editarCategoria(categoria)">
+                                                    <mat-icon svgIcon="heroicons_outline:pencil-square"></mat-icon>
+                                                </button>
+                                                <button
+                                                    mat-icon-button
+                                                    class="text-gray-600 hover:text-red-600 dark:text-gray-300 dark:hover:text-red-400"
+                                                    [matTooltip]="'Eliminar'"
+                                                    (click)="eliminarCategoria(categoria)">
+                                                    <mat-icon svgIcon="heroicons_outline:trash"></mat-icon>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                                <ng-template #noCategorias>
+                                    <tr>
+                                        <td colspan="3" class="p-8">
+                                            <div class="flex flex-col items-center justify-center text-center p-4">
+                                                <mat-icon svgIcon="heroicons_outline:face-frown" class="icon-size-16 text-gray-300 dark:text-gray-600 mb-4"></mat-icon>
+                                                <h3 class="text-lg font-medium mb-2">No hay categorías disponibles</h3>
+                                                <p class="text-secondary max-w-md mb-4">Crea una nueva categoría para comenzar a organizar tus productos</p>
+                                                <button
+                                                    mat-flat-button
+                                                    color="accent"
+                                                    (click)="crearCategoria()">
+                                                    <mat-icon svgIcon="heroicons_outline:plus"></mat-icon>
+                                                    <span class="ml-2">Nueva Categoría</span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-drawer-content>
+    </mat-drawer-container>
+</div>

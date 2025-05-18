@@ -1,0 +1,49 @@
+<!-- categoria-form.component.html -->
+<div class="flex flex-col flex-auto min-w-0 sm:overflow-hidden">
+    <!-- Header -->
+    <div class="flex flex-0 items-center justify-between h-16 pr-3 sm:pr-5 pl-6 sm:pl-8 bg-green-50 dark:bg-green-900">
+        <div class="text-lg font-medium">{{ modoEdicion ? 'Editar Categoría' : 'Nueva Categoría' }}</div>
+        <button
+            mat-icon-button
+            (click)="cerrarDrawer()">
+            <mat-icon [svgIcon]="'heroicons_outline:x-mark'"></mat-icon>
+        </button>
+    </div>
+
+    <!-- Form content -->
+    <form
+        class="flex-auto p-6 sm:p-8 overflow-y-auto"
+        [formGroup]="categoriaForm">
+
+        <!-- Campo de nombre -->
+        <div class="mb-6">
+            <mat-form-field class="w-full">
+                <mat-label>Nombre</mat-label>
+                <input
+                    matInput
+                    [formControlName]="'name'"
+                    required>
+                <mat-error *ngIf="categoriaForm.get('name').hasError('required')">
+                    El nombre es obligatorio
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <!-- Acciones -->
+        <div class="flex items-center justify-end mt-8">
+            <button
+                class="mr-4"
+                mat-stroked-button
+                (click)="cerrarDrawer()">
+                Cancelar
+            </button>
+            <button
+                mat-flat-button
+                [color]="'accent'"
+                [disabled]="categoriaForm.invalid || categoriaForm.disabled"
+                (click)="guardarCategoria()">
+                {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+            </button>
+        </div>
+    </form>
+</div>

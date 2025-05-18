@@ -257,11 +257,9 @@ export class ClientsDetailsComponent implements OnInit {
         invoiceContainer.style.left = '-9999px';
         invoiceContainer.style.top = '-9999px';
 
-        // Generate current date for filename
         const currentDate = this.datePipe.transform(new Date(), 'yyyyMMdd');
         const fileName = `orden${order.id}_${this.client.full_name.replace(/\s+/g, '_')}_${currentDate}.pdf`;
 
-        // Create invoice HTML content with modern compact design in pink colors
         invoiceContainer.innerHTML = `
     <div style="width: 800px; font-family: 'Helvetica', Arial, sans-serif; color: #334155; background: #fff; position: relative;">
         <!-- Modern header with pink gradient -->
@@ -269,11 +267,11 @@ export class ClientsDetailsComponent implements OnInit {
             <!-- Company Logo -->
             <div style="display: flex; align-items: center;">
                 <div style="width: 52px; height: 52px; background-color: white; border-radius: 8px; display: flex; justify-content: center; align-items: center;">
-                    <div style="font-size: 14px; font-weight: bold; color: #be185d;">LOGO</div>
+                    <img src="../../../../../../assets/images/logo/logo.svg">
                 </div>
                 <div style="margin-left: 15px;">
-                    <div style="font-size: 22px; font-weight: 700;">MI EMPRESA S.A.</div>
-                    <div style="font-size: 12px; opacity: 0.8;">info@miempresa.com | +593 123 456 789</div>
+                    <div style="font-size: 22px; font-weight: 700;">Corset Rosa y Violeta</div>
+                    <div style="font-size: 12px; opacity: 0.8;">corsetrosavioleta@gmail.com | +593 967 877 884</div>
                 </div>
             </div>
 
@@ -364,7 +362,7 @@ export class ClientsDetailsComponent implements OnInit {
         <!-- Footer -->
         <div style="background-color: #fdf2f8; padding: 15px; border-radius: 0 0 8px 8px; text-align: center; border-top: 2px solid #fbcfe8;">
             <div style="color: #be185d; font-weight: 700; margin-bottom: 5px; font-size: 14px;">¡Gracias por su compra!</div>
-            <div style="color: #64748b; font-size: 12px;">Mi Empresa S.A. | RUC: 0123456789 | www.miempresa.com</div>
+            <div style="color: #64748b; font-size: 12px;">Corset Rosa y Violeta. | San Rafael Valle de los Chillos | corsetrosavioleta@gmail.com </div>
         </div>
     </div>
     `;
